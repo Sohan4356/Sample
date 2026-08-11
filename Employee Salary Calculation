@@ -1,0 +1,41 @@
+class Employee {
+    String name;
+    double salary;
+
+    Employee(String name, double salary) {
+        this.name = name;
+        this.salary = salary;
+    }
+
+    void displayDetails() {
+        System.out.println("Employee Name: " + name);
+        System.out.println("Basic Salary : ₹" + salary);
+    }
+}
+
+class Manager extends Employee {
+    double bonus;
+
+    Manager(String name, double salary, double bonus) {
+        super(name, salary);
+        this.bonus = bonus;
+    }
+
+    void displaySalary() {
+        double totalSalary = salary + bonus;
+
+        displayDetails();
+        System.out.println("Bonus        : ₹" + bonus);
+        System.out.println("Total Salary : ₹" + totalSalary);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        Manager manager = new Manager("Rahul", 40000, 10000);
+
+        System.out.println("----- Manager Details -----");
+        manager.displaySalary();
+    }
+}
