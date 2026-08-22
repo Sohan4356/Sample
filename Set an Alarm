@@ -1,0 +1,50 @@
+import java.time.LocalTime;
+import java.util.Scanner;
+
+public class Alarm {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter alarm hour (0-23): ");
+        int hour = sc.nextInt();
+
+        System.out.print("Enter alarm minute (0-59): ");
+        int minute = sc.nextInt();
+
+        System.out.println("Alarm set for "
+                + String.format("%02d:%02d", hour, minute));
+
+        while (true) {
+
+            LocalTime currentTime = LocalTime.now();
+
+            if (currentTime.getHour() == hour &&
+                currentTime.getMinute() == minute) {
+
+                System.out.println("\n⏰ ALARM! Wake up!");
+
+                // Beep sound
+                for (int i = 0; i < 5; i++) {
+                    System.out.print("\007");
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        System.out.println("Alarm interrupted.");
+                    }
+                }
+
+                break;
+            }
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                System.out.println("Program interrupted.");
+                break;
+            }
+        }
+
+        sc.close();
+    }
+}
