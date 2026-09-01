@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Random Quote Generator</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .quote-box {
+            background: white;
+            width: 500px;
+            padding: 40px;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px #aaa;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+        }
+
+        #quote {
+            font-size: 22px;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        #author {
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background: #333;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="quote-box">
+
+        <h1>Random Quote 💬</h1>
+
+        <p id="quote">
+            "Believe you can and you're halfway there."
+        </p>
+
+        <p id="author">— Theodore Roosevelt</p>
+
+        <button onclick="generateQuote()">New Quote</button>
+
+    </div>
+
+    <script>
+
+        const quotes = [
+            {
+                quote: "Believe you can and you're halfway there.",
+                author: "Theodore Roosevelt"
+            },
+            {
+                quote: "The only way to do great work is to love what you do.",
+                author: "Steve Jobs"
+            },
+            {
+                quote: "Success is not final, failure is not fatal.",
+                author: "Winston Churchill"
+            },
+            {
+                quote: "Dream big and dare to fail.",
+                author: "Norman Vincent Peale"
+            },
+            {
+                quote: "It always seems impossible until it's done.",
+                author: "Nelson Mandela"
+            }
+        ];
+
+        function generateQuote() {
+
+            let randomIndex =
+                Math.floor(Math.random() * quotes.length);
+
+            document.getElementById("quote").textContent =
+                '"' + quotes[randomIndex].quote + '"';
+
+            document.getElementById("author").textContent =
+                "— " + quotes[randomIndex].author;
+        }
+
+    </script>
+
+</body>
+</html>
