@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Character Counter</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f2f2f2;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .container {
+            width: 400px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        textarea {
+            width: 90%;
+            height: 150px;
+            padding: 10px;
+            font-size: 16px;
+            resize: none;
+        }
+
+        #count {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🔢 Character Counter</h1>
+
+    <textarea id="text"
+        placeholder="Type something here..."
+        oninput="countCharacters()"></textarea>
+
+    <p id="count">Characters: 0</p>
+
+</div>
+
+<script>
+
+function countCharacters() {
+
+    let text = document.getElementById("text").value;
+
+    let count = text.length;
+
+    document.getElementById("count").innerText =
+        "Characters: " + count;
+}
+
+</script>
+
+</body>
+</html>
