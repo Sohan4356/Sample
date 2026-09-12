@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Responsive Navbar</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial;
+        }
+
+        .navbar {
+            background: #222;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .menu {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .menu a:hover {
+            color: yellow;
+        }
+
+        .menu-btn {
+            display: none;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        /* Mobile View */
+        @media (max-width: 600px) {
+
+            .menu-btn {
+                display: block;
+            }
+
+            .menu {
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background: #222;
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .menu.active {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            MyWebsite
+        </div>
+
+        <div class="menu-btn" onclick="toggleMenu()">
+            ☰
+        </div>
+
+        <ul class="menu" id="menu">
+
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Projects</a></li>
+            <li><a href="#">Contact</a></li>
+
+        </ul>
+
+    </nav>
+
+    <script>
+
+        function toggleMenu() {
+
+            let menu = document.getElementById("menu");
+
+            menu.classList.toggle("active");
+        }
+
+    </script>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+    <title>Responsive Navbar</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial;
+        }
+
+        .navbar {
+            background: #222;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .menu {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .menu a:hover {
+            color: yellow;
+        }
+
+        .menu-btn {
+            display: none;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        /* Mobile View */
+        @media (max-width: 600px) {
+
+            .menu-btn {
+                display: block;
+            }
+
+            .menu {
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background: #222;
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .menu.active {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            MyWebsite
+        </div>
+
+        <div class="menu-btn" onclick="toggleMenu()">
+            ☰
+        </div>
+
+        <ul class="menu" id="menu">
+
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Projects</a></li>
+            <li><a href="#">Contact</a></li>
+
+        </ul>
+
+    </nav>
+
+    <script>
+
+        function toggleMenu() {
+
+            let menu = document.getElementById("menu");
+
+            menu.classList.toggle("active");
+        }
+
+    </script>
+
+</body>
+</html>
