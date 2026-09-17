@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather App</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+        }
+
+        .weather-box {
+            width: 350px;
+            padding: 30px;
+            text-align: center;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 70%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 15px;
+            margin-left: 5px;
+            border: none;
+            border-radius: 8px;
+            background: #2196f3;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1976d2;
+        }
+
+        #weather {
+            margin-top: 25px;
+        }
+
+        .temperature {
+            font-size: 45px;
+            font-weight: bold;
+        }
+
+        .info {
+            margin: 10px;
+            font-size: 18px;
+        }
+
+        #error {
+            color: red;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="weather-box">
+
+        <h1>🌤️ Weather App</h1>
+
+        <input type="text" id="city" placeholder="Enter city">
+
+        <button onclick="getWeather()">Search</button>
+
+        <div id="weather"></div>
+
+        <p id="error"></p>
+
+    </div>
+
+
+    <script>
+
+        // Replace this with your OpenWeather API key
+        const API_KEY = "YOUR_API_KEY";
+
+
+        async function getWeather() {
+
+            const city = document.getElementById("city").value;
+
+            const weather = document.getElementById("weather");
+            const error = document.getElementById("error");
+
+            weather.innerHTML = "";
+            error.innerHTML = "";
+
+
+            if (city === "") {
+                error.innerHTML = "Please enter a city name!";
+                return;
+            }
+
+
+            try {
+
+                const url =
+                    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error("City not found");
+                }
+
+                const data = await response.json();
+
+
+                weather.innerHTML = `
+
+                    <h2>${data.name}</h2>
+
+                    <div class="temperature">
+                        ${Math.round(data.main.temp)}°C
+                    </div>
+
+                    <div class="info">
+                        🌥️ ${data.weather[0].description}
+                    </div>
+
+                    <div class="info">
+                        💧 Humidity: ${data.main.humidity}%
+                    </div>
+
+                    <div class="info">
+                        💨 Wind: ${data.wind.speed} m/s
+                    </div>
+
+                    <div class="info">
+                        🌡️ Feels like:
+                        ${Math.round(data.main.feels_like)}°C
+                    </div>
+
+                `;
+
+            } catch (err) {
+
+                error.innerHTML =
+                    "❌ City not found. Please try again.";
+
+            }
+        }
+
+    </script>
+
+</body>
+</html>
