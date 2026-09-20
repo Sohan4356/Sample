@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Music Player</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .player {
+            width: 350px;
+            background: white;
+            padding: 25px;
+            text-align: center;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .album {
+            width: 180px;
+            height: 180px;
+            margin: auto;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6a00, #ee0979);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 70px;
+        }
+
+        h2 {
+            margin-bottom: 5px;
+        }
+
+        p {
+            color: #777;
+        }
+
+        .progress {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button {
+            border: none;
+            background: #764ba2;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        button:hover {
+            background: #5b3780;
+        }
+
+        .play {
+            width: 55px;
+            height: 55px;
+        }
+
+        .volume {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="player">
+
+        <div class="album">🎵</div>
+
+        <h2 id="songTitle">My Song</h2>
+        <p id="artist">Unknown Artist</p>
+
+        <div class="time">
+            <span id="currentTime">0:00</span>
+            <span id="duration">0:00</span>
+        </div>
+
+        <input
+            type="range"
+            id="progress"
+            class="progress"
+            value="0"
+            min="0"
+            max="100"
+        >
+
+        <div class="controls">
+
+            <button onclick="previousSong()">⏮</button>
+
+            <button
+                class="play"
+                id="playBtn"
+                onclick="playPause()">
+                ▶
+            </button>
+
+            <button onclick="nextSong()">⏭</button>
+
+        </div>
+
+        <input
+            type="range"
+            id="volume"
+            class="volume"
+            min="0"
+            max="1"
+            step="0.01"
+            value="1"
+        >
+
+        <audio id="audio"></audio>
+
+    </div>
+
+
+    <script>
+
+        const songs = [
+            {
+                title: "Song One",
+                artist: "Artist One",
+                file: "song1.mp3"
+            },
+            {
+                title: "Song Two",
+                artist: "Artist Two",
+                file: "song2.mp3"
+            },
+            {
+                title: "Song Three",
+                artist: "Artist Three",
+                file: "song3.mp3"
+            }
+        ];
+
+
+        let currentSong = 0;
+
+        const audio = document.getElementById("audio");
+        const playBtn = document.getElementById("playBtn");
+        const progress = document.getElementById("progress");
+        const volume = document.getElementById("volume");
+
+
+        function loadSong() {
+
+            audio.src = songs[currentSong].file;
+
+            document.getElementById("songTitle").innerText =
+                songs[currentSong].title;
+
+            document.getElementById("artist").innerText =
+                songs[currentSong].artist;
+        }
+
+
+        function playPause() {
+
+            if (audio.paused) {
+
+                audio.play();
+
+                playBtn.innerText = "⏸";
+
+            } else {
+
+                audio.pause();
+
+                playBtn.innerText = "▶";
+            }
+        }
+
+
+        function nextSong() {
+
+            currentSong++;
+
+            if (currentSong >= songs.length) {
+                currentSong = 0;
+            }
+
+            loadSong();
+            audio.play();
+
+            playBtn.innerText = "⏸";
+        }
+
+
+        function previousSong() {
+
+            currentSong--;
+
+            if (currentSong < 0) {
+                currentSong = songs.length - 1;
+            }
+
+            loadSong();
+            audio.play();
+
+            playBtn.innerText = "⏸";
+        }
+
+
+        audio.addEventListener("timeupdate", function() {
+
+            let percentage =
+                (audio.currentTime / audio.duration) * 100;
+
+            progress.value = percentage || 0;
+
+            document.getElementById("currentTime").innerText =
+                formatTime(audio.currentTime);
+
+            document.getElementById("duration").innerText =
+                formatTime(audio.duration);
+
+        });
+
+
+        progress.addEventListener("input", function() {
+
+            audio.currentTime =
+                (progress.value / 100) * audio.duration;
+
+        });
+
+
+        volume.addEventListener("input", function() {
+
+            audio.volume = volume.value;
+
+        });
+
+
+        audio.addEventListener("ended", function() {
+
+            nextSong();
+
+        });
+
+
+        function formatTime(seconds) {
+
+            if (isNaN(seconds)) {
+                return "0:00";
+            }
+
+            let minutes = Math.floor(seconds / 60);
+
+            let remainingSeconds =
+                Math.floor(seconds % 60);
+
+            if (remainingSeconds < 10) {
+                remainingSeconds = "0" + remainingSeconds;
+            }
+
+            return minutes + ":" + remainingSeconds;
+        }
+
+
+        loadSong();
+
+    </script>
+
+</body>
+</html>
