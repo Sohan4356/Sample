@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stopwatch</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .stopwatch {
+            background: white;
+            width: 350px;
+            padding: 35px;
+            text-align: center;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        h1 {
+            margin-bottom: 25px;
+        }
+
+        #display {
+            font-size: 50px;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        button {
+            padding: 12px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            background: #2196f3;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1976d2;
+        }
+
+        .reset {
+            background: #f44336;
+        }
+
+        .reset:hover {
+            background: #d32f2f;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="stopwatch">
+
+        <h1>⏱️ Stopwatch</h1>
+
+        <div id="display">00:00:00</div>
+
+        <button onclick="start()">Start</button>
+
+        <button onclick="stop()">Stop</button>
+
+        <button class="reset" onclick="reset()">Reset</button>
+
+    </div>
+
+
+    <script>
+
+        let hours = 0;
+        let minutes = 0;
+        let seconds = 0;
+
+        let timer = null;
+
+
+        function start() {
+
+            if (timer !== null) {
+                return;
+            }
+
+            timer = setInterval(function() {
+
+                seconds++;
+
+                if (seconds === 60) {
+                    seconds = 0;
+                    minutes++;
+                }
+
+                if (minutes === 60) {
+                    minutes = 0;
+                    hours++;
+                }
+
+                updateDisplay();
+
+            }, 1000);
+        }
+
+
+        function stop() {
+
+            clearInterval(timer);
+
+            timer = null;
+        }
+
+
+        function reset() {
+
+            clearInterval(timer);
+
+            timer = null;
+
+            hours = 0;
+            minutes = 0;
+            seconds = 0;
+
+            updateDisplay();
+        }
+
+
+        function updateDisplay() {
+
+            let h = hours < 10 ? "0" + hours : hours;
+
+            let m = minutes < 10 ? "0" + minutes : minutes;
+
+            let s = seconds < 10 ? "0" + seconds : seconds;
+
+            document.getElementById("display").innerText =
+                h + ":" + m + ":" + s;
+        }
+
+    </script>
+
+</body>
+</html>
