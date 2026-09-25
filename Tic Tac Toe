@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tic Tac Toe</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .game {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        #status {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 15px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 8px;
+            margin: 20px auto;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            border: none;
+            border-radius: 10px;
+            background: #eee;
+            font-size: 45px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .cell:hover {
+            background: #ddd;
+        }
+
+        .reset {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .reset:hover {
+            background: #4f5fd1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="game">
+
+        <h1>❌⭕ Tic Tac Toe</h1>
+
+        <div id="status">
+            Player X's Turn
+        </div>
+
+        <div class="board">
+
+            <button class="cell" onclick="makeMove(0)"></button>
+            <button class="cell" onclick="makeMove(1)"></button>
+            <button class="cell" onclick="makeMove(2)"></button>
+
+            <button class="cell" onclick="makeMove(3)"></button>
+            <button class="cell" onclick="makeMove(4)"></button>
+            <button class="cell" onclick="makeMove(5)"></button>
+
+            <button class="cell" onclick="makeMove(6)"></button>
+            <button class="cell" onclick="makeMove(7)"></button>
+            <button class="cell" onclick="makeMove(8)"></button>
+
+        </div>
+
+        <button class="reset" onclick="resetGame()">
+            🔄 New Game
+        </button>
+
+    </div>
+
+
+    <script>
+
+        let board = [
+            "", "", "",
+            "", "", "",
+            "", "", ""
+        ];
+
+        let currentPlayer = "X";
+
+        let gameOver = false;
+
+
+        const winningPatterns = [
+
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+
+            [0, 4, 8],
+            [2, 4, 6]
+
+        ];
+
+
+        function makeMove(index) {
+
+            if (board[index] !== "" || gameOver) {
+                return;
+            }
+
+            board[index] = currentPlayer;
+
+            document.querySelectorAll(".cell")[index].innerText =
+                currentPlayer;
+
+            checkWinner();
+
+        }
+
+
+        function checkWinner() {
+
+            for (let pattern of winningPatterns) {
+
+                let a = pattern[0];
+                let b = pattern[1];
+                let c = pattern[2];
+
+
+                if (
+                    board[a] !== "" &&
+                    board[a] === board[b] &&
+                    board[a] === board[c]
+                ) {
+
+                    document.getElementById("status").innerText =
+                        "🎉 Player " + currentPlayer + " Wins!";
+
+                    gameOver = true;
+
+                    return;
+                }
+            }
+
+
+            // Check draw
+
+            if (!board.includes("")) {
+
+                document.getElementById("status").innerText =
+                    "🤝 It's a Draw!";
+
+                gameOver = true;
+
+                return;
+            }
+
+
+            // Change player
+
+            currentPlayer =
+                currentPlayer === "X" ? "O" : "X";
+
+
+            document.getElementById("status").innerText =
+                "Player " + currentPlayer + "'s Turn";
+        }
+
+
+        function resetGame() {
+
+            board = [
+                "", "", "",
+                "", "", "",
+                "", "", ""
+            ];
+
+            currentPlayer = "X";
+
+            gameOver = false;
+
+
+            document.querySelectorAll(".cell").forEach(function(cell) {
+
+                cell.innerText = "";
+
+            });
+
+
+            document.getElementById("status").innerText =
+                "Player X's Turn";
+        }
+
+    </script>
+
+</body>
+</html>
