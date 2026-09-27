@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Speed Test</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #222;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 600px;
+            background: #333;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #00ff88;
+        }
+
+        #text {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            line-height: 1.8;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            box-sizing: border-box;
+            padding: 15px;
+            font-size: 17px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            resize: none;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #00ff88;
+            color: black;
+        }
+
+        button:hover {
+            background: #00cc6a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>⌨️ Typing Speed Test</h1>
+
+        <p>Type the following sentence:</p>
+
+        <div id="text">
+            The quick brown fox jumps over the lazy dog.
+        </div>
+
+        <textarea
+            id="input"
+            placeholder="Start typing here..."
+            disabled>
+        </textarea>
+
+        <div class="stats">
+
+            <div>
+                ⏱️ Time:
+                <span id="time">60</span>s
+            </div>
+
+            <div>
+                🚀 WPM:
+                <span id="wpm">0</span>
+            </div>
+
+            <div>
+                🎯 Accuracy:
+                <span id="accuracy">100</span>%
+            </div>
+
+        </div>
+
+        <p>
+            ❌ Mistakes:
+            <span id="mistakes">0</span>
+        </p>
+
+        <button onclick="startTest()">Start Test</button>
+
+    </div>
+
+
+    <script>
+
+        const text =
+            "The quick brown fox jumps over the lazy dog.";
+
+        const input = document.getElementById("input");
+
+        let time = 60;
+        let timer;
+        let started = false;
+        let mistakes = 0;
+
+
+        function startTest() {
+
+            clearInterval(timer);
+
+            time = 60;
+            mistakes = 0;
+            started = false;
+
+            input.value = "";
+            input.disabled = false;
+            input.focus();
+
+            document.getElementById("time").innerText = time;
+            document.getElementById("wpm").innerText = 0;
+            document.getElementById("accuracy").innerText = 100;
+            document.getElementById("mistakes").innerText = 0;
+
+        }
+
+
+        input.addEventListener("input", function () {
+
+            if (!started) {
+
+                started = true;
+
+                timer = setInterval(function () {
+
+                    time--;
+
+                    document.getElementById("time").innerText = time;
+
+                    calculateResult();
+
+                    if (time <= 0) {
+
+                        clearInterval(timer);
+
+                        input.disabled = true;
+
+                        alert("⏰ Time's Up!");
+
+                    }
+
+                }, 1000);
+
+            }
+
+            calculateResult();
+
+        });
+
+
+        function calculateResult() {
+
+            let typedText = input.value;
+
+            mistakes = 0;
+
+            for (let i = 0; i < typedText.length; i++) {
+
+                if (typedText[i] !== text[i]) {
+
+                    mistakes++;
+
+                }
+
+            }
+
+            document.getElementById("mistakes").innerText = mistakes;
+
+
+            // Calculate accuracy
+
+            let accuracy = 100;
+
+            if (typedText.length > 0) {
+
+                accuracy =
+                    Math.max(
+                        0,
+                        Math.round(
+                            ((typedText.length - mistakes)
+                            / typedText.length) * 100
+                        )
+                    );
+
+            }
+
+            document.getElementById("accuracy").innerText =
+                accuracy;
+
+
+            // Calculate WPM
+
+            let elapsedTime = 60 - time;
+
+            if (elapsedTime > 0) {
+
+                let words =
+                    typedText.trim().split(/\s+/).filter(Boolean).length;
+
+                let wpm =
+                    Math.round(
+                        words / (elapsedTime / 60)
+                    );
+
+                document.getElementById("wpm").innerText =
+                    wpm;
+
+            }
+
+        }
+
+    </script>
+
+</body>
+</html>
