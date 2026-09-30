@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Recipe Finder</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #fff7ed;
+            margin: 0;
+            padding: 30px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            text-align: center;
+        }
+
+        h1 {
+            color: #e85d04;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 25px 0;
+        }
+
+        input {
+            width: 60%;
+            padding: 13px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 13px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #e85d04;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #c94d00;
+        }
+
+        #recipes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .recipe {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+
+        .recipe img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .recipe-content {
+            padding: 15px;
+        }
+
+        .recipe h2 {
+            color: #e85d04;
+            font-size: 20px;
+        }
+
+        .recipe p {
+            line-height: 1.6;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🍳 Recipe Finder</h1>
+
+        <p>Enter an ingredient to find recipes</p>
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="ingredient"
+                placeholder="Example: chicken"
+            >
+
+            <button onclick="findRecipes()">
+                Search
+            </button>
+
+        </div>
+
+        <div id="recipes"></div>
+
+    </div>
+
+
+    <script>
+
+        async function findRecipes() {
+
+            let ingredient =
+                document.getElementById("ingredient").value.trim();
+
+            let recipeContainer =
+                document.getElementById("recipes");
+
+
+            if (ingredient === "") {
+
+                recipeContainer.innerHTML =
+                    "<p class='error'>Please enter an ingredient.</p>";
+
+                return;
+            }
+
+
+            recipeContainer.innerHTML =
+                "<p>🔎 Searching for recipes...</p>";
+
+
+            try {
+
+                let response = await fetch(
+                    `https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`
+                );
+
+                let data = await response.json();
+
+
+                if (!data.meals) {
+
+                    recipeContainer.innerHTML =
+                        "<p class='error'>No recipes found.</p>";
+
+                    return;
+                }
+
+
+                recipeContainer.innerHTML = "";
+
+
+                data.meals.forEach(function(meal) {
+
+                    let recipe = document.createElement("div");
+
+                    recipe.className = "recipe";
+
+                    recipe.innerHTML = `
+
+                        <img
+                            src="${meal.strMealThumb}"
+                            alt="${meal.strMeal}"
+                        >
+
+                        <div class="recipe-content">
+
+                            <h2>${meal.strMeal}</h2>
+
+                            <button onclick="getRecipe(${meal.idMeal})">
+                                View Recipe
+                            </button>
+
+                        </div>
+
+                    `;
+
+                    recipeContainer.appendChild(recipe);
+
+                });
+
+            }
+
+            catch (error) {
+
+                recipeContainer.innerHTML =
+                    "<p class='error'>Something went wrong. Try again.</p>";
+
+            }
+        }
+
+
+        async function getRecipe(id) {
+
+            try {
+
+                let response = await fetch(
+                    `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`
+                );
+
+                let data = await response.json();
+
+                let meal = data.meals[0];
+
+
+                let ingredients = "";
+
+
+                for (let i = 1; i <= 20; i++) {
+
+                    let ingredient =
+                        meal["strIngredient" + i];
+
+                    let measure =
+                        meal["strMeasure" + i];
+
+
+                    if (ingredient && ingredient.trim() !== "") {
+
+                        ingredients +=
+                            `<li>${measure} ${ingredient}</li>`;
+                    }
+                }
+
+
+                document.getElementById("recipes").innerHTML = `
+
+                    <div class="recipe">
+
+                        <img
+                            src="${meal.strMealThumb}"
+                            alt="${meal.strMeal}"
+                        >
+
+                        <div class="recipe-content">
+
+                            <h2>${meal.strMeal}</h2>
+
+                            <h3>🥕 Ingredients</h3>
+
+                            <ul>
+                                ${ingredients}
+                            </ul>
+
+                            <h3>👨‍🍳 Instructions</h3>
+
+                            <p>
+                                ${meal.strInstructions}
+                            </p>
+
+                            <button onclick="findRecipes()">
+                                ← Back
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+            catch (error) {
+
+                alert("Unable to load recipe.");
+
+            }
+        }
+
+    </script>
+
+</body>
+</html>
