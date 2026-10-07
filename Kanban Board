@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f4f4;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .board {
+            display: flex;
+            gap: 20px;
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .column {
+            flex: 1;
+            background: #e8e8e8;
+            padding: 20px;
+            border-radius: 12px;
+            min-height: 450px;
+        }
+
+        .column h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .task {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            cursor: grab;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .task:active {
+            cursor: grabbing;
+        }
+
+        .column.drag-over {
+            background: #d5d5d5;
+        }
+
+        @media (max-width: 700px) {
+
+            .board {
+                flex-direction: column;
+            }
+
+            .column {
+                min-height: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>📋 Drag & Drop Kanban Board</h1>
+
+    <div class="board">
+
+        <!-- To Do -->
+        <div class="column" ondragover="allowDrop(event)"
+             ondrop="drop(event)"
+             ondragenter="dragEnter(event)"
+             ondragleave="dragLeave(event)">
+
+            <h2>📝 To Do</h2>
+
+            <div class="task"
+                 draggable="true"
+                 ondragstart="dragStart(event)"
+                 id="task1">
+                Complete HTML project
+            </div>
+
+            <div class="task"
+                 draggable="true"
+                 ondragstart="dragStart(event)"
+                 id="task2">
+                Study JavaScript
+            </div>
+
+        </div>
+
+
+        <!-- In Progress -->
+        <div class="column" ondragover="allowDrop(event)"
+             ondrop="drop(event)"
+             ondragenter="dragEnter(event)"
+             ondragleave="dragLeave(event)">
+
+            <h2>⚡ In Progress</h2>
+
+            <div class="task"
+                 draggable="true"
+                 ondragstart="dragStart(event)"
+                 id="task3">
+                Build portfolio
+            </div>
+
+        </div>
+
+
+        <!-- Completed -->
+        <div class="column" ondragover="allowDrop(event)"
+             ondrop="drop(event)"
+             ondragenter="dragEnter(event)"
+             ondragleave="dragLeave(event)">
+
+            <h2>✅ Completed</h2>
+
+            <div class="task"
+                 draggable="true"
+                 ondragstart="dragStart(event)"
+                 id="task4">
+                Learn CSS
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // Start dragging
+        function dragStart(event) {
+
+            event.dataTransfer.setData(
+                "text",
+                event.target.id
+            );
+        }
+
+
+        // Allow dropping
+        function allowDrop(event) {
+
+            event.preventDefault();
+        }
+
+
+        // Drop task
+        function drop(event) {
+
+            event.preventDefault();
+
+            const taskId =
+                event.dataTransfer.getData("text");
+
+            const task =
+                document.getElementById(taskId);
+
+            const column =
+                event.currentTarget;
+
+            column.appendChild(task);
+
+            column.classList.remove("drag-over");
+        }
+
+
+        // Highlight column
+        function dragEnter(event) {
+
+            event.currentTarget.classList.add("drag-over");
+        }
+
+
+        // Remove highlight
+        function dragLeave(event) {
+
+            event.currentTarget.classList.remove("drag-over");
+        }
+
+    </script>
+
+</body>
+</html>
