@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Online Code Editor</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            transition: 0.3s;
+        }
+
+        header {
+            background: #2563eb;
+            color: white;
+            padding: 18px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin-bottom: 8px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 15px;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            color: white;
+        }
+
+        .run-btn {
+            background: #16a34a;
+        }
+
+        .clear-btn {
+            background: #dc2626;
+        }
+
+        .theme-btn {
+            background: #475569;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .editors {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .editor-box {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px #00000015;
+        }
+
+        .editor-box h3 {
+            padding: 12px;
+            color: white;
+            background: #334155;
+        }
+
+        textarea {
+            width: 100%;
+            height: 260px;
+            padding: 12px;
+            border: none;
+            outline: none;
+            resize: vertical;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .preview-heading {
+            margin: 25px 0 10px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 350px;
+            border: 2px solid #cbd5e1;
+            background: white;
+            border-radius: 8px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+
+        /* Dark theme */
+
+        body.dark {
+            background: #0f172a;
+            color: #f8fafc;
+        }
+
+        body.dark .editor-box {
+            background: #1e293b;
+        }
+
+        body.dark textarea {
+            background: #1e293b;
+            color: #f8fafc;
+        }
+
+        body.dark iframe {
+            border-color: #475569;
+        }
+
+        body.dark footer {
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 800px) {
+            .editors {
+                grid-template-columns: 1fr;
+            }
+
+            textarea {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>💻 Online Code Editor</h1>
+    <p>Write Code • Run Code • See Output</p>
+</header>
+
+<div class="container">
+
+    <div class="toolbar">
+        <button class="run-btn" onclick="runCode()">
+            ▶ Run Code
+        </button>
+
+        <button class="clear-btn" onclick="clearCode()">
+            🗑 Clear
+        </button>
+
+        <button class="theme-btn" onclick="toggleTheme()">
+            🌙 Toggle Theme
+        </button>
+    </div>
+
+    <div class="editors">
+
+        <div class="editor-box">
+            <h3>🟠 HTML</h3>
+            <textarea id="htmlCode" spellcheck="false"><h1>Hello World!</h1>
+<p>Welcome to my Online Code Editor.</p>
+<button onclick="alert('Hello!')">Click Me</button></textarea>
+        </div>
+
+        <div class="editor-box">
+            <h3>🔵 CSS</h3>
+            <textarea id="cssCode" spellcheck="false">body {
+    font-family: Arial;
+    text-align: center;
+    padding: 30px;
+    background: #e0f2fe;
+}
+
+h1 {
+    color: #2563eb;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}</textarea>
+        </div>
+
+        <div class="editor-box">
+            <h3>🟡 JavaScript</h3>
+            <textarea id="jsCode" spellcheck="false">console.log("Hello from JavaScript!");
+
+document.body.insertAdjacentHTML(
+    "beforeend",
+    "<p>JavaScript is working!</p>"
+);</textarea>
+        </div>
+
+    </div>
+
+    <h2 class="preview-heading">👁️ Output Preview</h2>
+
+    <iframe
+        id="output"
+        title="Code output preview"
+        sandbox="allow-scripts">
+    </iframe>
+
+</div>
+
+<footer>
+    <p>Online Code Editor | Built with HTML, CSS & JavaScript</p>
+</footer>
+
+<script>
+    function runCode() {
+        const html = document.getElementById("htmlCode").value;
+        const css = document.getElementById("cssCode").value;
+        const js = document.getElementById("jsCode").value;
+
+        const output = document.getElementById("output");
+
+        const documentContent = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>${css}<\/style>
+</head>
+<body>
+${html}
+<script>
+try {
+${js}
+} catch (error) {
+    document.body.insertAdjacentHTML(
+        "beforeend",
+        "<pre style='color:red;white-space:pre-wrap'></pre>"
+    );
+    document.querySelector("pre").textContent = error.stack;
+}
+<\/script>
+</body>
+</html>`;
+
+        output.srcdoc = documentContent;
+    }
+
+    function clearCode() {
+        document.getElementById("htmlCode").value = "";
+        document.getElementById("cssCode").value = "";
+        document.getElementById("jsCode").value = "";
+
+        document.getElementById("output").srcdoc = "";
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle("dark");
+    }
+
+    // Run the sample code when the page opens.
+    runCode();
+</script>
+
+</body>
+</html>
