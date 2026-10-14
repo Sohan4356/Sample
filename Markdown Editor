@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Markdown Editor</title>
+
+    <!-- Markdown parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Sanitize generated HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            transition: 0.3s;
+        }
+
+        header {
+            background: #4f46e5;
+            color: white;
+            padding: 22px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin-bottom: 8px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 25px auto;
+            padding: 15px;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            border: none;
+            padding: 11px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .preview-btn {
+            background: #4f46e5;
+        }
+
+        .copy-btn {
+            background: #0891b2;
+        }
+
+        .download-btn {
+            background: #16a34a;
+        }
+
+        .clear-btn {
+            background: #dc2626;
+        }
+
+        .theme-btn {
+            background: #475569;
+        }
+
+        .editor-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px #00000010;
+        }
+
+        .panel h2 {
+            background: #e2e8f0;
+            padding: 15px;
+            font-size: 18px;
+        }
+
+        textarea {
+            display: block;
+            width: 100%;
+            height: 500px;
+            padding: 20px;
+            border: none;
+            outline: none;
+            resize: vertical;
+            font-family: Consolas, monospace;
+            font-size: 15px;
+            line-height: 1.7;
+            background: white;
+            color: #1e293b;
+        }
+
+        #preview {
+            height: 500px;
+            padding: 20px;
+            overflow: auto;
+            overflow-wrap: anywhere;
+            line-height: 1.7;
+        }
+
+        #preview h1,
+        #preview h2,
+        #preview h3 {
+            margin: 15px 0 10px;
+        }
+
+        #preview p {
+            margin: 10px 0;
+        }
+
+        #preview ul,
+        #preview ol {
+            margin: 10px 0 10px 25px;
+        }
+
+        #preview pre {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        #preview code {
+            background: #e2e8f0;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        #preview pre code {
+            background: transparent;
+            padding: 0;
+        }
+
+        #preview blockquote {
+            border-left: 4px solid #4f46e5;
+            padding-left: 15px;
+            margin: 15px 0;
+            color: #64748b;
+        }
+
+        #preview img {
+            max-width: 100%;
+        }
+
+        #preview table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #preview th,
+        #preview td {
+            border: 1px solid #cbd5e1;
+            padding: 8px;
+            text-align: left;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+
+        /* Dark mode */
+
+        body.dark {
+            background: #0f172a;
+            color: #f8fafc;
+        }
+
+        body.dark .panel {
+            background: #1e293b;
+        }
+
+        body.dark .panel h2 {
+            background: #334155;
+            color: white;
+        }
+
+        body.dark textarea {
+            background: #1e293b;
+            color: #f8fafc;
+        }
+
+        body.dark #preview code {
+            background: #334155;
+            color: #f8fafc;
+        }
+
+        body.dark #preview pre code {
+            background: transparent;
+        }
+
+        body.dark #preview blockquote {
+            color: #cbd5e1;
+        }
+
+        body.dark footer {
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 800px) {
+            .editor-layout {
+                grid-template-columns: 1fr;
+            }
+
+            textarea,
+            #preview {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>📝 Markdown Editor</h1>
+    <p>Write Markdown and preview it instantly!</p>
+</header>
+
+<div class="container">
+
+    <div class="toolbar">
+        <button class="preview-btn" onclick="updatePreview()">
+            👁️ Preview
+        </button>
+
+        <button class="copy-btn" onclick="copyMarkdown()">
+            📋 Copy Markdown
+        </button>
+
+        <button class="download-btn" onclick="downloadMarkdown()">
+            ⬇ Download .md
+        </button>
+
+        <button class="clear-btn" onclick="clearEditor()">
+            🗑 Clear
+        </button>
+
+        <button class="theme-btn" onclick="toggleTheme()">
+            🌙 Toggle Theme
+        </button>
+    </div>
+
+    <div class="editor-layout">
+
+        <div class="panel">
+            <h2>✍️ Write Markdown</h2>
+
+            <textarea id="markdown" spellcheck="false"># Welcome to Markdown Editor
+
+## About This Project
+
+This is a **Markdown Editor** built using HTML, CSS, and JavaScript.
+
+You can make text **bold**, *italic*, or ~~strikethrough~~.
+
+### My Favorite Subjects
+
+- Python
+- Java
+- Data Structures
+- Web Development
+
+### Numbered List
+
+1. Learn HTML
+2. Learn CSS
+3. Learn JavaScript
+
+### Add a Link
+
+[Visit Google](https://www.google.com)
+
+### Code Example
+
+```javascript
+function greet() {
+    console.log("Hello World!");
+}
+
+greet();
