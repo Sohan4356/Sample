@@ -1,0 +1,1080 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nova AI Chatbot</title>
+
+<style>
+:root {
+    --bg: #f4f6fb;
+    --panel: #ffffff;
+    --text: #182033;
+    --muted: #748096;
+    --border: #e5e9f2;
+    --primary: #6755e8;
+    --user: #6755e8;
+    --bot: #f0efff;
+}
+
+body.dark {
+    --bg: #111522;
+    --panel: #1b2030;
+    --text: #f3f5ff;
+    --muted: #a4aec3;
+    --border: #30374a;
+    --primary: #9385ff;
+    --user: #6755e8;
+    --bot: #29263f;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    transition: background .2s, color .2s;
+}
+
+button, textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.app {
+    display: flex;
+    height: 100%;
+    max-width: 1500px;
+    margin: auto;
+}
+
+/* Sidebar */
+
+.sidebar {
+    width: 255px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    padding: 22px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex-shrink: 0;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 23px;
+    font-weight: bold;
+    padding: 4px;
+}
+
+.brand-icon {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    background: var(--primary);
+    color: white;
+    border-radius: 12px;
+}
+
+.new-chat {
+    border: none;
+    background: var(--primary);
+    color: white;
+    padding: 13px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.section-label {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    overflow-y: auto;
+}
+
+.history-item {
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 11px;
+    border-radius: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.history-item:hover,
+.history-item.active {
+    background: var(--bg);
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+    display: grid;
+    gap: 10px;
+}
+
+.side-button {
+    padding: 12px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    border-radius: 9px;
+    text-align: left;
+}
+
+/* Main chat */
+
+.main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.topbar {
+    height: 72px;
+    flex-shrink: 0;
+    padding: 0 25px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.topbar h2 {
+    font-size: 18px;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+}
+
+.top-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel);
+    color: var(--text);
+    font-size: 17px;
+}
+
+.mobile-new {
+    display: none;
+}
+
+/* Messages */
+
+.chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px 20px;
+    scroll-behavior: smooth;
+}
+
+.messages {
+    max-width: 790px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.welcome {
+    text-align: center;
+    padding: 9vh 10px 15px;
+}
+
+.welcome-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #6755e8, #a78bfa);
+    color: white;
+    display: grid;
+    place-items: center;
+    font-size: 32px;
+    margin: 0 auto 22px;
+}
+
+.welcome h1 {
+    font-size: clamp(26px, 4vw, 36px);
+    margin-bottom: 12px;
+}
+
+.welcome p {
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.suggestions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 30px;
+    text-align: left;
+}
+
+.suggestion {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: left;
+    line-height: 1.5;
+    transition: border-color .2s;
+}
+
+.suggestion:hover {
+    border-color: var(--primary);
+}
+
+.suggestion strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.suggestion span {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.message {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    animation: appear .2s ease;
+}
+
+@keyframes appear {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    font-size: 17px;
+}
+
+.message.bot .avatar {
+    background: var(--primary);
+    color: white;
+}
+
+.message.user .avatar {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.message-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 9px;
+}
+
+.message-header strong {
+    font-size: 14px;
+}
+
+.time {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.bubble {
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.message.user .bubble {
+    display: inline-block;
+    background: var(--user);
+    color: white;
+    padding: 11px 15px;
+    border-radius: 15px 15px 4px 15px;
+    max-width: 100%;
+}
+
+.message.bot .bubble {
+    color: var(--text);
+}
+
+.message-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 9px;
+}
+
+.message-actions button {
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    font-size: 12px;
+    padding: 3px 0;
+}
+
+.message-actions button:hover {
+    color: var(--primary);
+}
+
+.typing {
+    display: flex;
+    gap: 5px;
+    padding: 10px 0;
+}
+
+.typing span {
+    width: 7px;
+    height: 7px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: bounce .8s infinite alternate;
+}
+
+.typing span:nth-child(2) {
+    animation-delay: .2s;
+}
+
+.typing span:nth-child(3) {
+    animation-delay: .4s;
+}
+
+@keyframes bounce {
+    to { opacity: .35; transform: translateY(-5px); }
+}
+
+/* Composer */
+
+.composer-wrap {
+    padding: 12px 20px 18px;
+    background: var(--bg);
+    flex-shrink: 0;
+}
+
+.composer {
+    max-width: 790px;
+    margin: auto;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 4px 20px #00000008;
+}
+
+.composer textarea {
+    width: 100%;
+    resize: none;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    padding: 5px;
+    min-height: 35px;
+    max-height: 150px;
+    line-height: 1.6;
+}
+
+.composer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 7px;
+}
+
+.hint {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.send-btn {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 12px;
+    background: var(--primary);
+    color: white;
+    font-size: 19px;
+}
+
+.send-btn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.disclaimer {
+    max-width: 790px;
+    margin: 10px auto 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+@media (max-width: 760px) {
+    .sidebar {
+        display: none;
+    }
+
+    .mobile-new {
+        display: inline-block;
+    }
+
+    .topbar {
+        padding: 0 14px;
+        height: 65px;
+    }
+
+    .chat-area {
+        padding: 20px 15px;
+    }
+
+    .welcome {
+        padding-top: 6vh;
+    }
+
+    .suggestions {
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    .suggestion {
+        padding: 12px;
+    }
+
+    .composer-wrap {
+        padding: 10px 12px 14px;
+    }
+
+    .hint {
+        font-size: 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">✦</div>
+            Nova AI
+        </div>
+
+        <button class="new-chat" id="newChatBtn">＋ New Chat</button>
+
+        <div>
+            <p class="section-label">Recent conversations</p>
+            <div class="history-list" id="historyList"></div>
+        </div>
+
+        <div class="sidebar-bottom">
+            <button class="side-button" id="clearHistoryBtn">
+                🗑 Clear All History
+            </button>
+            <button class="side-button" id="sidebarThemeBtn">
+                🌙 Toggle Theme
+            </button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h2>Nova Assistant</h2>
+                <div class="status">
+                    <span class="dot"></span>
+                    Demo assistant available
+                </div>
+            </div>
+
+            <div class="top-actions">
+                <button class="icon-btn mobile-new" id="mobileNewBtn"
+                        title="New chat" aria-label="New chat">＋</button>
+                <button class="icon-btn" id="themeBtn"
+                        title="Toggle theme" aria-label="Toggle theme">🌙</button>
+                <button class="icon-btn" id="clearChatBtn"
+                        title="Clear current chat" aria-label="Clear chat">🗑</button>
+            </div>
+        </header>
+
+        <section class="chat-area" id="chatArea">
+            <div class="messages" id="messages"></div>
+        </section>
+
+        <div class="composer-wrap">
+            <form class="composer" id="chatForm">
+                <textarea id="userInput" rows="1"
+                    placeholder="Message Nova..."
+                    aria-label="Your message"></textarea>
+
+                <div class="composer-bottom">
+                    <span class="hint">Enter to send · Shift + Enter for a new line</span>
+                    <button class="send-btn" id="sendBtn"
+                            type="submit" aria-label="Send message">↑</button>
+                </div>
+            </form>
+
+            <p class="disclaimer">
+                Nova uses demo responses. Verify important information independently.
+            </p>
+        </div>
+    </main>
+
+</div>
+
+<script>
+const STORAGE_KEY = "nova_chat_history_v1";
+const THEME_KEY = "nova_chat_theme_v1";
+
+const messagesElement = document.getElementById("messages");
+const input = document.getElementById("userInput");
+const chatArea = document.getElementById("chatArea");
+const sendBtn = document.getElementById("sendBtn");
+const historyList = document.getElementById("historyList");
+
+let conversations = [];
+let currentId = null;
+let isTyping = false;
+let typingTimer = null;
+
+function createId() {
+    return Date.now().toString(36) +
+        Math.random().toString(36).slice(2, 8);
+}
+
+function getTime() {
+    return new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+function saveHistory() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+    } catch (error) {
+        console.warn("Conversation history could not be saved.");
+    }
+}
+
+function loadHistory() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+        if (Array.isArray(saved)) {
+            conversations = saved
+                .filter(chat =>
+                    chat &&
+                    typeof chat.id === "string" &&
+                    Array.isArray(chat.messages)
+                )
+                .map(chat => ({
+                    id: chat.id,
+                    title: String(chat.title || "New conversation"),
+                    messages: chat.messages
+                        .filter(m =>
+                            m &&
+                            ["user", "bot"].includes(m.role) &&
+                            typeof m.text === "string"
+                        )
+                        .map(m => ({
+                            role: m.role,
+                            text: m.text,
+                            time: String(m.time || "")
+                        }))
+                }))
+                .slice(0, 30);
+        }
+    } catch (error) {
+        conversations = [];
+    }
+}
+
+function getCurrentChat() {
+    return conversations.find(chat => chat.id === currentId);
+}
+
+function createConversation() {
+    const chat = {
+        id: createId(),
+        title: "New conversation",
+        messages: []
+    };
+
+    conversations.unshift(chat);
+    currentId = chat.id;
+
+    saveHistory();
+    renderHistory();
+    renderMessages();
+
+    input.focus();
+}
+
+function welcomeScreen() {
+    const welcome = document.createElement("div");
+    welcome.className = "welcome";
+
+    const icon = document.createElement("div");
+    icon.className = "welcome-icon";
+    icon.textContent = "✦";
+
+    const heading = document.createElement("h1");
+    heading.textContent = "How can I help you today?";
+
+    const paragraph = document.createElement("p");
+    paragraph.textContent =
+        "Ask a question, learn something new, or get help with your next project.";
+
+    const suggestions = document.createElement("div");
+    suggestions.className = "suggestions";
+
+    const options = [
+        ["💻 Learn programming", "Explain JavaScript to a beginner"],
+        ["📝 Writing help", "Give me tips for writing a good resume"],
+        ["🧠 Brainstorm ideas", "Suggest creative college project ideas"],
+        ["📚 Study assistant", "Create a daily study plan for me"]
+    ];
+
+    options.forEach(([title, prompt]) => {
+        const button = document.createElement("button");
+        button.className = "suggestion";
+
+        const strong = document.createElement("strong");
+        strong.textContent = title;
+
+        const span = document.createElement("span");
+        span.textContent = prompt;
+
+        button.append(strong, span);
+        button.addEventListener("click", () => sendMessage(prompt));
+
+        suggestions.appendChild(button);
+    });
+
+    welcome.append(icon, heading, paragraph, suggestions);
+    messagesElement.appendChild(welcome);
+}
+
+function renderMessages() {
+    messagesElement.replaceChildren();
+
+    const chat = getCurrentChat();
+
+    if (!chat || chat.messages.length === 0) {
+        welcomeScreen();
+        return;
+    }
+
+    chat.messages.forEach(message => {
+        addMessageElement(message, false);
+    });
+
+    scrollToBottom();
+}
+
+function addMessageElement(message, scroll = true) {
+    const row = document.createElement("div");
+    row.className = "message " + message.role;
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = message.role === "bot" ? "✦" : "👤";
+
+    const content = document.createElement("div");
+    content.className = "message-content";
+
+    const header = document.createElement("div");
+    header.className = "message-header";
+
+    const name = document.createElement("strong");
+    name.textContent = message.role === "bot" ? "Nova AI" : "You";
+
+    const time = document.createElement("span");
+    time.className = "time";
+    time.textContent = message.time || "";
+
+    header.append(name, time);
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = message.text;
+
+    content.append(header, bubble);
+
+    if (message.role === "bot") {
+        const actions = document.createElement("div");
+        actions.className = "message-actions";
+
+        const copy = document.createElement("button");
+        copy.textContent = "📋 Copy";
+        copy.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(message.text);
+                copy.textContent = "✓ Copied";
+            } catch {
+                copy.textContent = "Copy unavailable";
+            }
+        });
+
+        actions.appendChild(copy);
+        content.appendChild(actions);
+    }
+
+    row.append(avatar, content);
+    messagesElement.appendChild(row);
+
+    if (scroll) scrollToBottom();
+}
+
+function scrollToBottom() {
+    requestAnimationFrame(() => {
+        chatArea.scrollTop = chatArea.scrollHeight;
+    });
+}
+
+function renderHistory() {
+    historyList.replaceChildren();
+
+    conversations.forEach(chat => {
+        const button = document.createElement("button");
+        button.className = "history-item" +
+            (chat.id === currentId ? " active" : "");
+
+        button.textContent = "💬 " + chat.title;
+        button.title = chat.title;
+
+        button.addEventListener("click", () => {
+            if (isTyping) return;
+            currentId = chat.id;
+            renderHistory();
+            renderMessages();
+        });
+
+        historyList.appendChild(button);
+    });
+}
+
+function showTyping() {
+    const row = document.createElement("div");
+    row.className = "message bot";
+    row.id = "typingIndicator";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = "✦";
+
+    const content = document.createElement("div");
+    content.className = "message-content";
+
+    const label = document.createElement("div");
+    label.className = "message-header";
+
+    const name = document.createElement("strong");
+    name.textContent = "Nova AI is typing";
+
+    label.appendChild(name);
+
+    const dots = document.createElement("div");
+    dots.className = "typing";
+
+    for (let i = 0; i < 3; i++) {
+        dots.appendChild(document.createElement("span"));
+    }
+
+    content.append(label, dots);
+    row.append(avatar, content);
+    messagesElement.appendChild(row);
+
+    scrollToBottom();
+}
+
+function hideTyping() {
+    document.getElementById("typingIndicator")?.remove();
+}
+
+function getDemoResponse(message) {
+    const text = message.toLowerCase().trim();
+
+    if (/^(hi|hello|hey|hii|good morning|good evening)\b/.test(text)) {
+        return "Hello! 👋 Welcome to Nova AI. What would you like to explore today?";
+    }
+
+    if (text.includes("your name") || text.includes("who are you")) {
+        return "I'm Nova, a demo chatbot built using HTML, CSS, and JavaScript. I'm here to demonstrate how a chat interface works!";
+    }
+
+    if (text.includes("javascript") || text.includes("programming")) {
+        return "💻 Here's a simple way to start learning programming:\n\n1. Understand variables and data types.\n2. Learn conditions and loops.\n3. Practice functions and arrays.\n4. Build small projects.\n5. Solve coding problems regularly.\n\nConsistency matters more than studying for many hours at once.";
+    }
+
+    if (text.includes("html")) {
+        return "🌐 HTML stands for HyperText Markup Language. It defines the structure of a webpage using elements such as headings, paragraphs, images, and links.\n\nExample:\n<h1>Hello World</h1>\n<p>My first webpage!</p>\n\nThis chatbot demo uses HTML for its structure.";
+    }
+
+    if (text.includes("css")) {
+        return "🎨 CSS stands for Cascading Style Sheets. It controls the appearance of webpages, including colors, spacing, layouts, animations, and responsive design.\n\nTry learning Flexbox, CSS Grid, and media queries next!";
+    }
+
+    if (text.includes("resume") || text.includes("cv")) {
+        return "📝 Resume tips:\n\n1. Keep your resume clear and concise.\n2. Add your education and relevant skills.\n3. Include academic or personal projects.\n4. Describe your contributions with specific examples.\n5. Check grammar and formatting before sending.\n\nTailor your resume to each role.";
+    }
+
+    if (text.includes("project") || text.includes("ideas")) {
+        return "🚀 Here are some project ideas:\n\n• Weather dashboard\n• Expense tracker\n• AI chatbot interface\n• Student task manager\n• Online quiz application\n• Job search website\n• Personal portfolio\n\nStart with a small working version, then add more features.";
+    }
+
+    if (text.includes("study") || text.includes("timetable")) {
+        return "📚 Try this simple study routine:\n\n• 25 minutes: Learn one topic.\n• 5 minutes: Take a break.\n• 25 minutes: Practice questions.\n• 10 minutes: Review what you learned.\n• End the day by summarizing key points.\n\nAdjust the routine to your schedule and energy level.";
+    }
+
+    if (text.includes("thank")) {
+        return "You're welcome! 😊 Feel free to ask another question whenever you'd like.";
+    }
+
+    if (text.includes("help")) {
+        return "I can demonstrate responses about programming, HTML, CSS, resume tips, project ideas, and study routines.\n\nTry asking one of these questions, or explore the suggested prompts above!";
+    }
+
+    if (text.includes("time") || text.includes("date")) {
+        return "Your device's current date and time are:\n\n" +
+            new Date().toLocaleString() +
+            "\n\nThis value comes from your browser's local clock.";
+    }
+
+    const responses = [
+        "That's an interesting question! This demo chatbot has a limited set of built-in responses. Try asking about programming, project ideas, resumes, or study tips.",
+        "Let's explore that! I can currently demonstrate basic replies about web development and studying. For open-ended answers, this interface would need to connect to a real AI service.",
+        "Thanks for your message! 😊 I'm running in demo mode, so I don't have a real AI model connected yet. Try one of the suggested prompts for a more specific response."
+    ];
+
+    return responses[Math.floor(Math.random() * responses.length)];
+}
+
+function sendMessage(text) {
+    if (isTyping) return;
+
+    const cleanText = text.trim();
+
+    if (!cleanText) return;
+
+    if (!getCurrentChat()) {
+        createConversation();
+    }
+
+    const chat = getCurrentChat();
+
+    chat.messages.push({
+        role: "user",
+        text: cleanText,
+        time: getTime()
+    });
+
+    if (chat.title === "New conversation") {
+        chat.title = cleanText.length > 28
+            ? cleanText.slice(0, 28) + "…"
+            : cleanText;
+    }
+
+    input.value = "";
+    resizeInput();
+
+    isTyping = true;
+    sendBtn.disabled = true;
+
+    renderMessages();
+    renderHistory();
+    saveHistory();
+
+    showTyping();
+
+    // Simulate a short response delay.
+    typingTimer = setTimeout(() => {
+        hideTyping();
+
+        const response = getDemoResponse(cleanText);
+
+        chat.messages.push({
+            role: "bot",
+            text: response,
+            time: getTime()
+        });
+
+        isTyping = false;
+        sendBtn.disabled = false;
+
+        saveHistory();
+        renderMessages();
+        renderHistory();
+        input.focus();
+    }, 650 + Math.random() * 650);
+}
+
+function resizeInput() {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 150) + "px";
+}
+
+function clearCurrentChat() {
+    if (isTyping) return;
+
+    const chat = getCurrentChat();
+    if (!chat) return;
+
+    chat.messages = [];
+    chat.title = "New conversation";
+
+    saveHistory();
+    renderHistory();
+    renderMessages();
+}
+
+function toggleTheme() {
+    document.body.classList.toggle("dark");
+
+    const dark = document.body.classList.contains("dark");
+
+    document.getElementById("themeBtn").textContent =
+        dark ? "☀️" : "🌙";
+
+    document.getElementById("sidebarThemeBtn").textContent =
+        dark ? "☀️ Light Theme" : "🌙 Dark Theme";
+
+    try {
+        localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+    } catch {}
+}
+
+document.getElementById("chatForm").addEventListener("submit", event => {
+    event.preventDefault();
+    sendMessage(input.value);
+});
+
+input.addEventListener("input", resizeInput);
+
+input.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+
+        if (!sendBtn.disabled) {
+            sendMessage(input.value);
+        }
+    }
+});
+
+document.getElementById("newChatBtn").addEventListener("click", () => {
+    if (!isTyping) createConversation();
+});
+
+document.getElementById("mobileNewBtn").addEventListener("click", () => {
+    if (!isTyping) createConversation();
+});
+
+document.getElementById("clearChatBtn").addEventListener(
+    "click",
+    clearCurrentChat
+);
+
+document.getElementById("themeBtn").addEventListener("click", toggleTheme);
+
+document.getElementById("sidebarThemeBtn").addEventListener(
+    "click",
+    toggleTheme
+);
+
+document.getElementById("clearHistoryBtn").addEventListener("click", () => {
+    if (isTyping) return;
+
+    if (confirm("Delete all saved conversations?")) {
+        conversations = [];
+        currentId = null;
+
+        saveHistory();
+        createConversation();
+    }
+});
+
+// Initialize the application.
+loadHistory();
+
+try {
+    if (localStorage.getItem(THEME_KEY) === "dark") {
+        document.body.classList.add("dark");
+        document.getElementById("themeBtn").textContent = "☀️";
+        document.getElementById("sidebarThemeBtn").textContent = "☀️ Light Theme";
+    }
+} catch {}
+
+if (conversations.length > 0) {
+    currentId = conversations[0].id;
+} else {
+    createConversation();
+}
+
+renderHistory();
+renderMessages();
+</script>
+
+</body>
+</html>
