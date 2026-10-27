@@ -1,0 +1,1131 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitTrack - Fitness Tracker</title>
+
+<style>
+:root {
+    --bg: #f4f7f5;
+    --card: #ffffff;
+    --text: #17251e;
+    --muted: #718078;
+    --border: #e1e9e3;
+    --green: #16834a;
+    --green-light: #e1f5e8;
+    --purple: #eee8ff;
+    --orange: #fff0db;
+    --blue: #e1f2ff;
+}
+
+body.dark {
+    --bg: #111b16;
+    --card: #1c2921;
+    --text: #f1f5f2;
+    --muted: #a7b5ab;
+    --border: #34443a;
+    --green-light: #254735;
+    --purple: #382d50;
+    --orange: #493823;
+    --blue: #203c50;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background .2s, color .2s;
+}
+
+button, input, select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+}
+
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 230px;
+    padding: 28px 18px;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--green);
+    margin-bottom: 35px;
+}
+
+.logo span {
+    color: var(--text);
+}
+
+.nav-title {
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    margin: 22px 10px 12px;
+}
+
+.nav-link {
+    display: block;
+    text-decoration: none;
+    color: var(--muted);
+    padding: 13px 12px;
+    margin-bottom: 5px;
+    border-radius: 8px;
+}
+
+.nav-link:hover, .nav-link.active {
+    background: var(--green-light);
+    color: var(--green);
+}
+
+main {
+    flex: 1;
+    min-width: 0;
+    padding: 30px;
+    max-width: 1500px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.subtitle, .muted {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+input, select {
+    width: 100%;
+    min-width: 0;
+    padding: 11px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--text);
+}
+
+.top-actions input {
+    width: auto;
+}
+
+.btn {
+    border: none;
+    border-radius: 8px;
+    padding: 11px 15px;
+    background: var(--green);
+    color: white;
+    font-weight: bold;
+}
+
+.btn:hover {
+    opacity: .88;
+}
+
+.btn-light {
+    background: var(--green-light);
+    color: var(--green);
+}
+
+.btn-danger {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.grid {
+    display: grid;
+    gap: 18px;
+}
+
+.stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-bottom: 22px;
+}
+
+.card {
+    min-width: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 21px;
+    scroll-margin-top: 20px;
+}
+
+.stat-label {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.stat-value {
+    font-size: clamp(23px, 2.5vw, 32px);
+    font-weight: bold;
+    margin-bottom: 8px;
+    overflow-wrap: anywhere;
+}
+
+.stat-note {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.content-grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+    margin-bottom: 22px;
+}
+
+.card-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.card-heading h2 {
+    font-size: 18px;
+}
+
+.icon {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    font-size: 21px;
+    margin-bottom: 15px;
+}
+
+.green-bg { background: var(--green-light); }
+.purple-bg { background: var(--purple); }
+.orange-bg { background: var(--orange); }
+.blue-bg { background: var(--blue); }
+
+.progress-track {
+    width: 100%;
+    height: 10px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0 9px;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0;
+    background: var(--green);
+    border-radius: 10px;
+    transition: width .3s;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.step-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.step-controls input {
+    flex: 1;
+}
+
+.water-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.water-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.circle-btn {
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    width: 39px;
+    height: 39px;
+    border-radius: 50%;
+    font-size: 20px;
+}
+
+.goal-form {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.goal-form input {
+    flex: 1;
+}
+
+.workout-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.workout-form .full {
+    grid-column: 1 / -1;
+}
+
+.field label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 7px;
+    color: var(--muted);
+}
+
+.workout-list {
+    display: grid;
+    gap: 10px;
+}
+
+.workout-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 13px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.workout-item strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.workout-item p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.delete-btn {
+    border: none;
+    border-radius: 7px;
+    padding: 8px 10px;
+    background: #fee2e2;
+    color: #b91c1c;
+    flex-shrink: 0;
+}
+
+.empty {
+    color: var(--muted);
+    text-align: center;
+    padding: 20px 8px;
+    font-size: 14px;
+}
+
+.history-list {
+    display: grid;
+    gap: 14px;
+}
+
+.history-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 80px;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.history-row .progress-track {
+    margin: 0;
+    height: 8px;
+}
+
+.history-date {
+    color: var(--muted);
+}
+
+.history-value {
+    text-align: right;
+    font-weight: bold;
+}
+
+footer {
+    padding: 25px 0 5px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--text);
+    color: var(--card);
+    padding: 13px 18px;
+    border-radius: 9px;
+    box-shadow: 0 5px 20px #0002;
+    max-width: calc(100% - 40px);
+    z-index: 5;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 1050px) {
+    .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        width: 62px;
+        padding: 20px 6px;
+    }
+
+    .logo {
+        font-size: 0;
+        text-align: center;
+    }
+
+    .logo::after {
+        content: "💪";
+        font-size: 23px;
+    }
+
+    .logo span, .nav-title {
+        display: none;
+    }
+
+    .nav-link {
+        font-size: 0;
+        text-align: center;
+        padding: 13px 4px;
+    }
+
+    .nav-link::first-letter {
+        font-size: 19px;
+    }
+
+    main {
+        padding: 18px 12px;
+    }
+
+    h1 {
+        font-size: 23px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .history-row {
+        grid-template-columns: 66px 1fr 62px;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 390px) {
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .workout-form {
+        grid-template-columns: 1fr;
+    }
+
+    .workout-form .full {
+        grid-column: auto;
+    }
+
+    .step-controls, .goal-form {
+        flex-wrap: wrap;
+    }
+
+    .step-controls input, .goal-form input {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="logo">Fit<span>Track</span></div>
+
+        <p class="nav-title">Menu</p>
+        <a href="#dashboard" class="nav-link active">🏠 Dashboard</a>
+        <a href="#activity" class="nav-link">👟 Activity</a>
+        <a href="#workouts" class="nav-link">🏋️ Workouts</a>
+        <a href="#water" class="nav-link">💧 Water</a>
+        <a href="#history" class="nav-link">📅 History</a>
+    </aside>
+
+    <main id="dashboard">
+
+        <header class="topbar">
+            <div>
+                <h1>Fitness Dashboard 💪</h1>
+                <p class="subtitle" id="welcomeDate"></p>
+            </div>
+
+            <div class="top-actions">
+                <input type="date" id="selectedDate"
+                       aria-label="Choose activity date">
+                <button class="btn btn-light" id="themeButton">
+                    🌙 Theme
+                </button>
+            </div>
+        </header>
+
+        <!-- Statistics -->
+        <section class="grid stats">
+
+            <article class="card">
+                <div class="icon green-bg">👟</div>
+                <p class="stat-label">Steps Taken</p>
+                <p class="stat-value" id="stepsValue">0</p>
+                <p class="stat-note" id="stepNote">Daily step goal</p>
+            </article>
+
+            <article class="card">
+                <div class="icon orange-bg">🔥</div>
+                <p class="stat-label">Estimated Calories</p>
+                <p class="stat-value" id="caloriesValue">0</p>
+                <p class="stat-note">kcal burned (estimate)</p>
+            </article>
+
+            <article class="card">
+                <div class="icon blue-bg">📍</div>
+                <p class="stat-label">Distance</p>
+                <p class="stat-value" id="distanceValue">0 km</p>
+                <p class="stat-note">Estimated from steps</p>
+            </article>
+
+            <article class="card">
+                <div class="icon purple-bg">⏱️</div>
+                <p class="stat-label">Workout Time</p>
+                <p class="stat-value" id="minutesValue">0 min</p>
+                <p class="stat-note">Total exercise duration</p>
+            </article>
+
+        </section>
+
+        <!-- Activity and water -->
+        <section class="grid content-grid">
+
+            <article class="card" id="activity">
+                <div class="card-heading">
+                    <h2>👟 Daily Steps</h2>
+                    <span class="muted">Goal progress</span>
+                </div>
+
+                <p class="stat-value" id="stepProgressText">0%</p>
+
+                <div class="progress-track"
+                     role="progressbar"
+                     id="stepProgressBar"
+                     aria-label="Daily step goal progress"
+                     aria-valuemin="0"
+                     aria-valuemax="100"
+                     aria-valuenow="0">
+                    <div class="progress-fill" id="stepProgressFill"></div>
+                </div>
+
+                <div class="progress-info">
+                    <span id="stepsCurrent">0 steps</span>
+                    <span id="stepsGoalLabel">Goal: 8,000</span>
+                </div>
+
+                <div class="step-controls">
+                    <input type="number" id="stepInput"
+                           min="1" max="100000"
+                           placeholder="Add steps"
+                           aria-label="Number of steps to add">
+                    <button class="btn" id="addStepsButton">
+                        + Add Steps
+                    </button>
+                </div>
+
+                <form class="goal-form" id="goalForm">
+                    <input type="number" id="goalInput"
+                           min="100" max="100000"
+                           placeholder="New step goal"
+                           aria-label="New daily step goal" required>
+                    <button class="btn btn-light" type="submit">
+                        Set Goal
+                    </button>
+                </form>
+            </article>
+
+            <article class="card" id="water">
+                <div class="card-heading">
+                    <h2>💧 Water Intake</h2>
+                </div>
+
+                <p class="stat-value" id="waterValue">0 ml</p>
+                <p class="muted">Track the water you drink</p>
+
+                <div class="progress-track"
+                     role="progressbar"
+                     id="waterProgressBar"
+                     aria-label="Water intake progress"
+                     aria-valuemin="0"
+                     aria-valuemax="100"
+                     aria-valuenow="0">
+                    <div class="progress-fill" id="waterProgressFill"
+                         style="background:#3899e8"></div>
+                </div>
+
+                <div class="progress-info">
+                    <span id="waterCurrent">0 ml</span>
+                    <span>Demo target: 2,000 ml</span>
+                </div>
+
+                <div class="water-controls">
+                    <span class="muted">250 ml per glass</span>
+                    <div class="water-buttons">
+                        <button class="circle-btn" id="removeWater"
+                                aria-label="Remove one glass of water">−</button>
+                        <button class="circle-btn" id="addWater"
+                                aria-label="Add one glass of water">+</button>
+                    </div>
+                </div>
+            </article>
+
+        </section>
+
+        <!-- Workouts -->
+        <section class="card" id="workouts" style="margin-bottom:22px">
+            <div class="card-heading">
+                <h2>🏋️ Workout Tracker</h2>
+                <span class="muted">Your exercise log</span>
+            </div>
+
+            <form id="workoutForm" class="workout-form">
+                <div class="field">
+                    <label for="workoutName">Workout Name</label>
+                    <input id="workoutName" type="text"
+                           maxlength="60"
+                           placeholder="e.g. Running, Cycling"
+                           required>
+                </div>
+
+                <div class="field">
+                    <label for="workoutType">Workout Type</label>
+                    <select id="workoutType">
+                        <option value="Cardio">Cardio</option>
+                        <option value="Strength">Strength Training</option>
+                        <option value="Flexibility">Flexibility</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="workoutMinutes">Duration (minutes)</label>
+                    <input id="workoutMinutes" type="number"
+                           min="1" max="1440"
+                           placeholder="30" required>
+                </div>
+
+                <div class="field">
+                    <label for="workoutCalories">Estimated Calories</label>
+                    <input id="workoutCalories" type="number"
+                           min="0" max="10000"
+                           placeholder="150" required>
+                </div>
+
+                <button class="btn full" type="submit">
+                    + Add Workout
+                </button>
+            </form>
+
+            <div id="workoutList" class="workout-list"></div>
+        </section>
+
+        <!-- History -->
+        <section class="card" id="history">
+            <div class="card-heading">
+                <h2>📅 Recent Activity History</h2>
+                <span class="muted">Last 7 days</span>
+            </div>
+
+            <div id="historyList" class="history-list"></div>
+        </section>
+
+        <footer>
+            FitTrack · Personal Fitness Tracker<br><br>
+            Activity estimates are for general tracking only.
+        </footer>
+
+    </main>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+const STORAGE_KEY = "fittrack_intermediate_v1";
+
+function localDateKey(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function createDay() {
+    return {
+        steps: 0,
+        water: 0,
+        workouts: []
+    };
+}
+
+function loadState() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+        if (saved && typeof saved === "object") {
+            return {
+                goal: Number.isFinite(saved.goal) ? saved.goal : 8000,
+                days: saved.days && typeof saved.days === "object"
+                    ? saved.days : {},
+                dark: saved.dark === true
+            };
+        }
+    } catch (error) {
+        console.warn("Could not load saved fitness data.", error);
+    }
+
+    return {
+        goal: 8000,
+        days: {},
+        dark: false
+    };
+}
+
+let state = loadState();
+let selectedDate = localDateKey();
+
+const $ = id => document.getElementById(id);
+
+function getDay(dateKey = selectedDate) {
+    if (!state.days[dateKey] ||
+        typeof state.days[dateKey] !== "object") {
+        state.days[dateKey] = createDay();
+    }
+
+    const day = state.days[dateKey];
+
+    if (!Number.isFinite(day.steps) || day.steps < 0) {
+        day.steps = 0;
+    }
+
+    if (!Number.isFinite(day.water) || day.water < 0) {
+        day.water = 0;
+    }
+
+    if (!Array.isArray(day.workouts)) {
+        day.workouts = [];
+    }
+
+    return day;
+}
+
+function saveState() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+        showToast("Could not save data in this browser.");
+    }
+}
+
+function showToast(message) {
+    const toast = $("toast");
+    toast.textContent = message;
+    toast.hidden = false;
+
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => {
+        toast.hidden = true;
+    }, 2500);
+}
+
+function formatNumber(value) {
+    return Math.round(value).toLocaleString();
+}
+
+function totalWorkoutMinutes(day) {
+    return day.workouts.reduce(
+        (total, workout) => total + workout.minutes, 0
+    );
+}
+
+function totalWorkoutCalories(day) {
+    return day.workouts.reduce(
+        (total, workout) => total + workout.calories, 0
+    );
+}
+
+function estimatedCalories(day) {
+    // Rough demonstration estimate; actual burn varies by person.
+    return Math.round(day.steps * 0.04) + totalWorkoutCalories(day);
+}
+
+function renderDashboard() {
+    const day = getDay();
+
+    $("welcomeDate").textContent =
+        new Date(selectedDate + "T12:00:00").toLocaleDateString(
+            undefined,
+            {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+
+    $("stepsValue").textContent = formatNumber(day.steps);
+    $("caloriesValue").textContent =
+        formatNumber(estimatedCalories(day));
+
+    const distance = day.steps * 0.000762;
+    $("distanceValue").textContent = distance.toFixed(2) + " km";
+
+    $("minutesValue").textContent =
+        formatNumber(totalWorkoutMinutes(day)) + " min";
+
+    const stepPercent = Math.min(
+        100, Math.round((day.steps / state.goal) * 100)
+    );
+
+    $("stepProgressText").textContent = stepPercent + "%";
+    $("stepProgressFill").style.width = stepPercent + "%";
+    $("stepProgressBar").setAttribute("aria-valuenow", stepPercent);
+
+    $("stepsCurrent").textContent = formatNumber(day.steps) + " steps";
+    $("stepsGoalLabel").textContent =
+        "Goal: " + formatNumber(state.goal);
+
+    $("stepNote").textContent =
+        formatNumber(Math.max(0, state.goal - day.steps)) +
+        " steps to goal";
+
+    $("goalInput").value = state.goal;
+
+    $("waterValue").textContent = formatNumber(day.water) + " ml";
+    $("waterCurrent").textContent = formatNumber(day.water) + " ml";
+
+    const waterPercent = Math.min(
+        100, Math.round((day.water / 2000) * 100)
+    );
+
+    $("waterProgressFill").style.width = waterPercent + "%";
+    $("waterProgressBar").setAttribute("aria-valuenow", waterPercent);
+
+    renderWorkouts(day);
+    renderHistory();
+}
+
+function renderWorkouts(day) {
+    const list = $("workoutList");
+    list.replaceChildren();
+
+    if (day.workouts.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent =
+            "No workouts logged for this date. Add your first workout above!";
+        list.appendChild(empty);
+        return;
+    }
+
+    day.workouts.forEach(workout => {
+        const item = document.createElement("div");
+        item.className = "workout-item";
+
+        const details = document.createElement("div");
+
+        const name = document.createElement("strong");
+        name.textContent = workout.name;
+
+        const info = document.createElement("p");
+        info.textContent =
+            `${workout.type} · ${workout.minutes} min · ` +
+            `${formatNumber(workout.calories)} estimated kcal`;
+
+        details.append(name, info);
+
+        const remove = document.createElement("button");
+        remove.className = "delete-btn";
+        remove.textContent = "Delete";
+        remove.setAttribute(
+            "aria-label", `Delete workout ${workout.name}`
+        );
+
+        remove.addEventListener("click", () => {
+            const currentDay = getDay();
+            currentDay.workouts =
+                currentDay.workouts.filter(w => w.id !== workout.id);
+
+            saveState();
+            renderDashboard();
+            showToast("Workout deleted.");
+        });
+
+        item.append(details, remove);
+        list.appendChild(item);
+    });
+}
+
+function renderHistory() {
+    const list = $("historyList");
+    list.replaceChildren();
+
+    const today = new Date(selectedDate + "T12:00:00");
+
+    for (let offset = 6; offset >= 0; offset--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - offset);
+
+        const key = localDateKey(date);
+        const day = state.days[key] || createDay();
+
+        const row = document.createElement("div");
+        row.className = "history-row";
+
+        const dateLabel = document.createElement("span");
+        dateLabel.className = "history-date";
+        dateLabel.textContent = offset === 0
+            ? "Selected day"
+            : date.toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric"
+            });
+
+        const track = document.createElement("div");
+        track.className = "progress-track";
+
+        const fill = document.createElement("div");
+        fill.className = "progress-fill";
+        fill.style.width = Math.min(
+            100, (day.steps / state.goal) * 100
+        ) + "%";
+
+        track.appendChild(fill);
+
+        const value = document.createElement("span");
+        value.className = "history-value";
+        value.textContent = formatNumber(day.steps);
+
+        row.append(dateLabel, track, value);
+        list.appendChild(row);
+    }
+}
+
+$("addStepsButton").addEventListener("click", () => {
+    const input = $("stepInput");
+    const amount = Number(input.value);
+
+    if (!Number.isInteger(amount) || amount < 1 || amount > 100000) {
+        showToast("Enter a step amount between 1 and 100,000.");
+        return;
+    }
+
+    const day = getDay();
+
+    if (day.steps + amount > 1000000) {
+        showToast("Step total is too high.");
+        return;
+    }
+
+    day.steps += amount;
+    input.value = "";
+
+    saveState();
+    renderDashboard();
+    showToast("Steps added successfully!");
+});
+
+$("goalForm").addEventListener("submit", event => {
+    event.preventDefault();
+
+    const goal = Number($("goalInput").value);
+
+    if (!Number.isInteger(goal) || goal < 100 || goal > 100000) {
+        showToast("Choose a goal between 100 and 100,000 steps.");
+        return;
+    }
+
+    state.goal = goal;
+
+    saveState();
+    renderDashboard();
+    showToast("Daily step goal updated!");
+});
+
+$("addWater").addEventListener("click", () => {
+    const day = getDay();
+
+    if (day.water + 250 > 20000) {
+        showToast("Water entry limit reached.");
+        return;
+    }
+
+    day.water += 250;
+    saveState();
+    renderDashboard();
+});
+
+$("removeWater").addEventListener("click", () => {
+    const day = getDay();
+    day.water = Math.max(0, day.water - 250);
+
+    saveState();
+    renderDashboard();
+});
+
+$("workoutForm").addEventListener("submit", event => {
+    event.preventDefault();
+
+    const name = $("workoutName").value.trim();
+    const type = $("workoutType").value;
+    const minutes = Number($("workoutMinutes").value);
+    const calories = Number($("workoutCalories").value);
+
+    if (!name) {
+        showToast("Enter a workout name.");
+        return;
+    }
+
+    if (!Number.isInteger(minutes) || minutes < 1 || minutes > 1440) {
+        showToast("Duration must be between 1 and 1,440 minutes.");
+        return;
+    }
+
+    if (!Number.isFinite(calories) ||
+        !Number.isInteger(calories) ||
+        calories < 0 || calories > 10000) {
+        showToast("Enter calories between 0 and 10,000.");
+        return;
+    }
+
+    const day = getDay();
+
+    day.workouts.push({
+        id: Date.now().toString() + Math.random().toString(16).slice(2),
+        name,
+        type,
+        minutes,
+        calories
+    });
+
+    saveState();
+    renderDashboard();
+
+    $("workoutForm").reset();
+    showToast("Workout added successfully!");
+});
+
+$("selectedDate").addEventListener("change", () => {
+    const value = $("selectedDate").value;
+
+    if (!value) {
+        $("selectedDate").value = selectedDate;
+        return;
+    }
+
+    selectedDate = value;
+    renderDashboard();
+});
+
+$("themeButton").addEventListener("click", () => {
+    state.dark = !state.dark;
+    applyTheme();
+    saveState();
+});
+
+function applyTheme() {
+    document.body.classList.toggle("dark", state.dark);
+    $("themeButton").textContent =
+        state.dark ? "☀️ Light Mode" : "🌙 Dark Mode";
+}
+
+document.querySelectorAll(".nav-link").forEach(link => {
+    link.addEventListener("click", () => {
+        document.querySelectorAll(".nav-link").forEach(item =>
+            item.classList.remove("active")
+        );
+
+        link.classList.add("active");
+    });
+});
+
+// Initialize the application.
+$("selectedDate").value = selectedDate;
+applyTheme();
+renderDashboard();
+</script>
+
+</body>
+</html>
