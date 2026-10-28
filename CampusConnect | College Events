@@ -1,0 +1,1425 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusConnect | College Events</title>
+
+<style>
+:root {
+    --primary: #5b4bdb;
+    --primary-dark: #4636c7;
+    --bg: #f5f6fc;
+    --card: #ffffff;
+    --text: #20243a;
+    --muted: #737b91;
+    --border: #e5e7f0;
+    --green: #159957;
+    --red: #dc3545;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+}
+
+button, input, select, textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 17px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.logo {
+    color: var(--primary);
+    font-size: 23px;
+    font-weight: bold;
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+nav button {
+    background: transparent;
+    border: none;
+    padding: 10px 13px;
+    color: var(--muted);
+    border-radius: 7px;
+}
+
+nav button.active,
+nav button:hover {
+    background: #eeecff;
+    color: var(--primary);
+}
+
+.hero {
+    padding: 42px 5%;
+    color: white;
+    background: linear-gradient(120deg, #5141cc, #8175ef);
+}
+
+.hero h1 {
+    font-size: clamp(27px, 4vw, 38px);
+    margin-bottom: 8px;
+}
+
+.hero p {
+    opacity: 0.9;
+}
+
+.container {
+    max-width: 1250px;
+    margin: 28px auto;
+    padding: 0 22px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 17px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 21px;
+    border-radius: 12px;
+}
+
+.stat-label {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.stat-number {
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: 6px;
+    color: var(--primary);
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 19px;
+}
+
+.section-heading h2 {
+    font-size: 23px;
+}
+
+.primary-btn, .secondary-btn, .danger-btn {
+    border: none;
+    padding: 10px 15px;
+    border-radius: 7px;
+    font-weight: bold;
+}
+
+.primary-btn {
+    background: var(--primary);
+    color: white;
+}
+
+.primary-btn:hover {
+    background: var(--primary-dark);
+}
+
+.secondary-btn {
+    background: #eeecff;
+    color: var(--primary);
+}
+
+.danger-btn {
+    background: #fff0f0;
+    color: var(--red);
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 200px 180px;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 11px 12px;
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+}
+
+.event-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 19px;
+}
+
+.event-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.event-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px #20243a0d;
+}
+
+.event-banner {
+    min-height: 110px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #eeecff;
+}
+
+.event-emoji {
+    font-size: 42px;
+}
+
+.category-tag {
+    display: inline-block;
+    background: #ffffffd9;
+    color: #5141cc;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 9px;
+    border-radius: 20px;
+}
+
+.event-content {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.event-content h3 {
+    font-size: 18px;
+    margin-bottom: 9px;
+}
+
+.event-description {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    overflow-wrap: anywhere;
+}
+
+.event-meta {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 2;
+    margin-bottom: 15px;
+}
+
+.seat-track {
+    height: 6px;
+    background: #eceef5;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 7px 0 14px;
+}
+
+.seat-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 10px;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: auto;
+}
+
+.card-actions button {
+    flex: 1;
+}
+
+.heart-btn {
+    flex: 0 0 43px !important;
+    background: #fff0f3;
+    color: #d6336c;
+    border: none;
+    border-radius: 7px;
+    font-size: 18px;
+}
+
+.empty {
+    grid-column: 1 / -1;
+    padding: 40px 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 23px;
+    margin-bottom: 28px;
+}
+
+.panel h2 {
+    margin-bottom: 18px;
+}
+
+.admin-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.field label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.field.full {
+    grid-column: 1 / -1;
+}
+
+.field textarea {
+    min-height: 85px;
+    resize: vertical;
+}
+
+.form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 580px;
+}
+
+th, td {
+    text-align: left;
+    padding: 13px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+}
+
+th {
+    color: var(--muted);
+    font-weight: bold;
+}
+
+.status {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    background: #e0f8e9;
+    color: #167844;
+}
+
+.status.cancelled {
+    background: #fff0f0;
+    color: var(--red);
+}
+
+.toast {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    max-width: calc(100% - 44px);
+    background: #20243a;
+    color: white;
+    padding: 14px 19px;
+    border-radius: 9px;
+    box-shadow: 0 5px 20px #0002;
+    z-index: 20;
+}
+
+footer {
+    padding: 25px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+dialog {
+    border: none;
+    border-radius: 13px;
+    padding: 25px;
+    width: calc(100% - 30px);
+    max-width: 500px;
+    margin: auto;
+    background: var(--card);
+    color: var(--text);
+    box-shadow: 0 15px 50px #0003;
+}
+
+dialog::backdrop {
+    background: #15152b99;
+}
+
+dialog h2 {
+    margin-bottom: 7px;
+}
+
+.dialog-subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.dialog-form {
+    display: grid;
+    gap: 14px;
+}
+
+.dialog-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+@media (max-width: 1000px) {
+    .event-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .filters {
+        grid-template-columns: minmax(0, 1fr) 1fr;
+    }
+
+    .filters input {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 650px) {
+    header {
+        padding: 15px 4%;
+    }
+
+    nav {
+        width: 100%;
+    }
+
+    nav button {
+        flex: 1;
+        padding: 9px 5px;
+        font-size: 13px;
+    }
+
+    .hero {
+        padding: 32px 5%;
+    }
+
+    .container {
+        padding: 0 13px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .stat-number {
+        font-size: 25px;
+    }
+
+    .event-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filters {
+        grid-template-columns: 1fr;
+    }
+
+    .filters input {
+        grid-column: auto;
+    }
+
+    .admin-form {
+        grid-template-columns: 1fr;
+    }
+
+    .field.full, .form-actions {
+        grid-column: auto;
+    }
+
+    .panel {
+        padding: 16px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">🎓 CampusConnect</div>
+
+    <nav aria-label="Main navigation">
+        <button class="active" data-page="eventsPage">Events</button>
+        <button data-page="registrationsPage">My Registrations</button>
+        <button data-page="adminPage">Manage Events</button>
+    </nav>
+</header>
+
+<section class="hero">
+    <h1>Discover Your Campus Events</h1>
+    <p>Explore workshops, hackathons, cultural fests, and more.</p>
+</section>
+
+<main class="container">
+
+    <!-- Dashboard statistics -->
+    <section class="stats" aria-label="Event statistics">
+        <article class="stat-card">
+            <p class="stat-label">Total Events</p>
+            <p class="stat-number" id="totalEvents">0</p>
+        </article>
+
+        <article class="stat-card">
+            <p class="stat-label">Student Registrations</p>
+            <p class="stat-number" id="totalRegistrations">0</p>
+        </article>
+
+        <article class="stat-card">
+            <p class="stat-label">Upcoming Events</p>
+            <p class="stat-number" id="upcomingEvents">0</p>
+        </article>
+    </section>
+
+    <!-- Events page -->
+    <section id="eventsPage" class="page">
+        <div class="section-heading">
+            <h2>Upcoming Events</h2>
+            <span id="eventCount" class="stat-label"></span>
+        </div>
+
+        <div class="filters">
+            <input id="searchInput" type="search"
+                   placeholder="Search event or venue..."
+                   aria-label="Search events">
+
+            <select id="categoryFilter" aria-label="Filter by category">
+                <option value="All">All Categories</option>
+                <option value="Technology">Technology</option>
+                <option value="Cultural">Cultural</option>
+                <option value="Sports">Sports</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Business">Business</option>
+            </select>
+
+            <select id="sortFilter" aria-label="Sort events">
+                <option value="date">Sort: Date</option>
+                <option value="name">Sort: Name</option>
+                <option value="seats">Sort: Available Seats</option>
+            </select>
+        </div>
+
+        <div id="eventGrid" class="event-grid"></div>
+    </section>
+
+    <!-- My registrations page -->
+    <section id="registrationsPage" class="page" hidden>
+        <div class="section-heading">
+            <h2>My Registrations</h2>
+        </div>
+
+        <div class="panel">
+            <p class="stat-label" style="margin-bottom: 15px;">
+                Enter the email address you used to register.
+            </p>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <input id="myEmail" type="email"
+                       placeholder="student@example.com"
+                       style="flex:1;min-width:200px;"
+                       aria-label="Your registration email">
+
+                <button class="primary-btn" id="lookupBtn">
+                    Find Registrations
+                </button>
+            </div>
+        </div>
+
+        <div id="myRegistrations" class="event-grid"></div>
+    </section>
+
+    <!-- Admin page -->
+    <section id="adminPage" class="page" hidden>
+        <div class="section-heading">
+            <h2>Manage College Events</h2>
+        </div>
+
+        <div class="panel">
+            <h2>Add a New Event</h2>
+
+            <form id="eventForm" class="admin-form">
+                <div class="field">
+                    <label for="eventTitle">Event Name *</label>
+                    <input id="eventTitle" required maxlength="80"
+                           placeholder="e.g. Tech Hackathon">
+                </div>
+
+                <div class="field">
+                    <label for="eventCategory">Category *</label>
+                    <select id="eventCategory" required>
+                        <option value="Technology">Technology</option>
+                        <option value="Cultural">Cultural</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Workshop">Workshop</option>
+                        <option value="Business">Business</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="eventDate">Event Date *</label>
+                    <input id="eventDate" type="date" required>
+                </div>
+
+                <div class="field">
+                    <label for="eventTime">Event Time *</label>
+                    <input id="eventTime" type="time" required>
+                </div>
+
+                <div class="field">
+                    <label for="eventVenue">Venue *</label>
+                    <input id="eventVenue" required maxlength="100"
+                           placeholder="e.g. Main Auditorium">
+                </div>
+
+                <div class="field">
+                    <label for="eventCapacity">Maximum Participants *</label>
+                    <input id="eventCapacity" type="number"
+                           min="1" max="10000" required value="100">
+                </div>
+
+                <div class="field full">
+                    <label for="eventDescription">Description *</label>
+                    <textarea id="eventDescription" required
+                              maxlength="500"
+                              placeholder="Describe the event..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="primary-btn">
+                        + Add Event
+                    </button>
+
+                    <button type="reset" class="secondary-btn">
+                        Clear Form
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel">
+            <h2>Event Management</h2>
+            <p class="stat-label" style="margin-bottom:15px;">
+                Delete demo events or events you added. Deleting an event
+                also deletes its registrations.
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Registered</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    CampusConnect · College Event Management System
+</footer>
+
+<!-- Registration dialog -->
+<dialog id="registerDialog">
+    <h2>Register for Event</h2>
+    <p id="registerEventName" class="dialog-subtitle"></p>
+
+    <form id="registrationForm" class="dialog-form">
+        <div class="field">
+            <label for="studentName">Full Name *</label>
+            <input id="studentName" required maxlength="80"
+                   autocomplete="name" placeholder="Enter your full name">
+        </div>
+
+        <div class="field">
+            <label for="studentEmail">College Email *</label>
+            <input id="studentEmail" type="email" required maxlength="120"
+                   autocomplete="email" placeholder="you@example.com">
+        </div>
+
+        <div class="field">
+            <label for="studentDepartment">Department *</label>
+            <select id="studentDepartment" required>
+                <option value="">Select department</option>
+                <option>CSE</option>
+                <option>IT</option>
+                <option>ECE</option>
+                <option>EEE</option>
+                <option>Mechanical</option>
+                <option>Civil</option>
+                <option>Business Administration</option>
+                <option>Other</option>
+            </select>
+        </div>
+
+        <p id="registrationError" role="alert"
+           style="color:#dc3545;font-size:14px;"></p>
+
+        <div class="dialog-actions">
+            <button type="button" class="secondary-btn"
+                    id="cancelRegistration">Cancel</button>
+            <button type="submit" class="primary-btn">Confirm</button>
+        </div>
+    </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script>
+"use strict";
+
+// ---------- Sample data ----------
+
+const initialEvents = [
+    {
+        id: "evt1",
+        title: "National Tech Hackathon",
+        category: "Technology",
+        date: "2026-11-15",
+        time: "09:00",
+        venue: "Innovation Lab",
+        capacity: 100,
+        description: "Build innovative solutions, collaborate with talented students, and present your ideas to judges.",
+        emoji: "💻"
+    },
+    {
+        id: "evt2",
+        title: "Annual Cultural Fest",
+        category: "Cultural",
+        date: "2026-11-20",
+        time: "10:00",
+        venue: "Main Auditorium",
+        capacity: 250,
+        description: "Celebrate campus life with music, dance, performances, art, and exciting competitions.",
+        emoji: "🎭"
+    },
+    {
+        id: "evt3",
+        title: "AI and Machine Learning Workshop",
+        category: "Workshop",
+        date: "2026-11-25",
+        time: "11:00",
+        venue: "Computer Lab 2",
+        capacity: 60,
+        description: "Learn the basics of artificial intelligence and machine learning through practical exercises.",
+        emoji: "🤖"
+    },
+    {
+        id: "evt4",
+        title: "Inter-College Cricket Cup",
+        category: "Sports",
+        date: "2026-12-05",
+        time: "08:00",
+        venue: "College Sports Ground",
+        capacity: 120,
+        description: "Join the college sports celebration with team competitions and exciting matches.",
+        emoji: "🏏"
+    },
+    {
+        id: "evt5",
+        title: "Startup and Entrepreneurship Summit",
+        category: "Business",
+        date: "2026-12-12",
+        time: "10:30",
+        venue: "Seminar Hall",
+        capacity: 80,
+        description: "Explore startup ideas, hear from entrepreneurs, and learn how to turn ideas into businesses.",
+        emoji: "🚀"
+    },
+    {
+        id: "evt6",
+        title: "Web Development Bootcamp",
+        category: "Workshop",
+        date: "2026-12-18",
+        time: "09:30",
+        venue: "Digital Learning Center",
+        capacity: 50,
+        description: "Practice HTML, CSS, and JavaScript while building your first responsive website.",
+        emoji: "🌐"
+    }
+];
+
+function loadData(key, fallback) {
+    try {
+        const saved = localStorage.getItem(key);
+        return saved === null ? fallback : JSON.parse(saved);
+    } catch (error) {
+        return fallback;
+    }
+}
+
+let events = loadData("campusEvents", null);
+let registrations = loadData("campusRegistrations", []);
+let favorites = loadData("campusFavorites", []);
+
+if (!Array.isArray(events)) {
+    events = initialEvents;
+}
+
+if (!Array.isArray(registrations)) registrations = [];
+if (!Array.isArray(favorites)) favorites = [];
+
+let selectedEventId = null;
+let toastTimer;
+
+const $ = id => document.getElementById(id);
+
+function saveData() {
+    try {
+        localStorage.setItem("campusEvents", JSON.stringify(events));
+        localStorage.setItem(
+            "campusRegistrations",
+            JSON.stringify(registrations)
+        );
+        localStorage.setItem("campusFavorites", JSON.stringify(favorites));
+        return true;
+    } catch (error) {
+        showToast("Could not save data. Browser storage may be full.");
+        return false;
+    }
+}
+
+function showToast(message) {
+    $("toast").textContent = message;
+    $("toast").hidden = false;
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+        $("toast").hidden = true;
+    }, 3000);
+}
+
+function escapeDate(date) {
+    return new Date(date + "T00:00:00");
+}
+
+function formatDate(date) {
+    return escapeDate(date).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    });
+}
+
+function getEventRegistrations(eventId) {
+    return registrations.filter(reg => reg.eventId === eventId);
+}
+
+function getSeatsLeft(event) {
+    return Math.max(
+        0,
+        Number(event.capacity) - getEventRegistrations(event.id).length
+    );
+}
+
+function isUpcoming(event) {
+    return event.date >= new Date().toISOString().slice(0, 10);
+}
+
+function getEmoji(category) {
+    const emojis = {
+        Technology: "💻",
+        Cultural: "🎭",
+        Sports: "🏆",
+        Workshop: "🧠",
+        Business: "🚀"
+    };
+
+    return emojis[category] || "🎓";
+}
+
+// ---------- Dashboard statistics ----------
+
+function renderStats() {
+    $("totalEvents").textContent = events.length;
+    $("totalRegistrations").textContent = registrations.length;
+    $("upcomingEvents").textContent = events.filter(isUpcoming).length;
+}
+
+// ---------- Event listing and filters ----------
+
+function createButton(text, className, handler) {
+    const button = document.createElement("button");
+    button.textContent = text;
+    button.className = className;
+    button.type = "button";
+    button.addEventListener("click", handler);
+    return button;
+}
+
+function renderEvents() {
+    const query = $("searchInput").value.trim().toLowerCase();
+    const category = $("categoryFilter").value;
+    const sort = $("sortFilter").value;
+
+    let filtered = events.filter(event => {
+        const text = (
+            event.title + " " +
+            event.venue + " " +
+            event.description + " " +
+            event.category
+        ).toLowerCase();
+
+        return text.includes(query) &&
+            (category === "All" || event.category === category);
+    });
+
+    filtered.sort((a, b) => {
+        if (sort === "name") return a.title.localeCompare(b.title);
+
+        if (sort === "seats") {
+            return getSeatsLeft(b) - getSeatsLeft(a);
+        }
+
+        return a.date.localeCompare(b.date);
+    });
+
+    $("eventCount").textContent =
+        `${filtered.length} event${filtered.length === 1 ? "" : "s"} found`;
+
+    const grid = $("eventGrid");
+    grid.replaceChildren();
+
+    if (filtered.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent =
+            "No events found. Try changing your search or category.";
+        grid.appendChild(empty);
+        return;
+    }
+
+    filtered.forEach(event => {
+        const registered = getEventRegistrations(event.id).length;
+        const seatsLeft = getSeatsLeft(event);
+        const capacity = Number(event.capacity);
+        const percentage = capacity > 0
+            ? Math.min(100, registered / capacity * 100)
+            : 100;
+
+        const card = document.createElement("article");
+        card.className = "event-card";
+
+        const banner = document.createElement("div");
+        banner.className = "event-banner";
+
+        const emoji = document.createElement("span");
+        emoji.className = "event-emoji";
+        emoji.textContent = event.emoji || getEmoji(event.category);
+
+        const tag = document.createElement("span");
+        tag.className = "category-tag";
+        tag.textContent = event.category;
+
+        banner.append(emoji, tag);
+
+        const content = document.createElement("div");
+        content.className = "event-content";
+
+        const title = document.createElement("h3");
+        title.textContent = event.title;
+
+        const description = document.createElement("p");
+        description.className = "event-description";
+        description.textContent = event.description;
+
+        const meta = document.createElement("div");
+        meta.className = "event-meta";
+        meta.textContent =
+            `📅 ${formatDate(event.date)} · ${event.time}\n` +
+            `📍 ${event.venue}\n` +
+            `👥 ${registered}/${capacity} participants`;
+        meta.style.whiteSpace = "pre-line";
+
+        const track = document.createElement("div");
+        track.className = "seat-track";
+
+        const fill = document.createElement("div");
+        fill.className = "seat-fill";
+        fill.style.width = percentage + "%";
+        track.appendChild(fill);
+
+        const seats = document.createElement("p");
+        seats.className = "event-description";
+        seats.textContent = seatsLeft > 0
+            ? `${seatsLeft} seats available`
+            : "Registration full";
+
+        const actions = document.createElement("div");
+        actions.className = "card-actions";
+
+        const heart = createButton(
+            favorites.includes(event.id) ? "♥" : "♡",
+            "heart-btn",
+            () => toggleFavorite(event.id)
+        );
+        heart.setAttribute(
+            "aria-label",
+            favorites.includes(event.id)
+                ? "Remove from favorites"
+                : "Add to favorites"
+        );
+        heart.title = "Toggle favorite";
+
+        const register = createButton(
+            seatsLeft === 0 ? "Full" : "Register",
+            "primary-btn",
+            () => openRegistration(event.id)
+        );
+
+        register.disabled = seatsLeft === 0;
+        if (seatsLeft === 0) register.style.opacity = "0.55";
+
+        actions.append(heart, register);
+        content.append(title, description, meta, track, seats, actions);
+        card.append(banner, content);
+        grid.appendChild(card);
+    });
+}
+
+function toggleFavorite(id) {
+    if (favorites.includes(id)) {
+        favorites = favorites.filter(favoriteId => favoriteId !== id);
+        showToast("Removed from favorites.");
+    } else {
+        favorites.push(id);
+        showToast("Event added to favorites.");
+    }
+
+    saveData();
+    renderEvents();
+}
+
+// ---------- Student registration ----------
+
+function openRegistration(id) {
+    const event = events.find(item => item.id === id);
+    if (!event) return;
+
+    if (getSeatsLeft(event) <= 0) {
+        showToast("Sorry, this event is full.");
+        return;
+    }
+
+    selectedEventId = id;
+    $("registerEventName").textContent =
+        `${event.title} · ${formatDate(event.date)}`;
+
+    $("registrationError").textContent = "";
+    $("registrationForm").reset();
+    $("registerDialog").showModal();
+}
+
+$("cancelRegistration").addEventListener("click", () => {
+    $("registerDialog").close();
+});
+
+$("registrationForm").addEventListener("submit", event => {
+    event.preventDefault();
+
+    const selectedEvent = events.find(
+        item => item.id === selectedEventId
+    );
+
+    if (!selectedEvent) {
+        $("registrationError").textContent = "Event not found.";
+        return;
+    }
+
+    if (getSeatsLeft(selectedEvent) <= 0) {
+        $("registrationError").textContent =
+            "Sorry, registration is now full.";
+        return;
+    }
+
+    const name = $("studentName").value.trim();
+    const email = $("studentEmail").value.trim().toLowerCase();
+    const department = $("studentDepartment").value;
+
+    if (!name || !email || !department) {
+        $("registrationError").textContent =
+            "Please complete all fields.";
+        return;
+    }
+
+    const duplicate = registrations.some(reg =>
+        reg.eventId === selectedEventId &&
+        reg.email.toLowerCase() === email
+    );
+
+    if (duplicate) {
+        $("registrationError").textContent =
+            "This email is already registered for this event.";
+        return;
+    }
+
+    const registration = {
+        id: "reg_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8),
+        eventId: selectedEventId,
+        name,
+        email,
+        department,
+        registeredAt: new Date().toISOString()
+    };
+
+    registrations.push(registration);
+
+    if (!saveData()) {
+        registrations.pop();
+        return;
+    }
+
+    $("registerDialog").close();
+    showToast("Registration successful! Welcome to the event.");
+
+    renderAll();
+});
+
+// ---------- My registrations ----------
+
+function renderMyRegistrations() {
+    const email = $("myEmail").value.trim().toLowerCase();
+    const container = $("myRegistrations");
+    container.replaceChildren();
+
+    if (!email) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "Enter your registration email to find events.";
+        container.appendChild(empty);
+        return;
+    }
+
+    const found = registrations.filter(
+        reg => reg.email.toLowerCase() === email
+    );
+
+    if (found.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent =
+            "No registrations found for this email address.";
+        container.appendChild(empty);
+        return;
+    }
+
+    found.forEach(reg => {
+        const event = events.find(item => item.id === reg.eventId);
+        if (!event) return;
+
+        const card = document.createElement("article");
+        card.className = "event-card";
+
+        const banner = document.createElement("div");
+        banner.className = "event-banner";
+
+        const emoji = document.createElement("span");
+        emoji.className = "event-emoji";
+        emoji.textContent = event.emoji || getEmoji(event.category);
+
+        const tag = document.createElement("span");
+        tag.className = "category-tag";
+        tag.textContent = "Registered";
+
+        banner.append(emoji, tag);
+
+        const content = document.createElement("div");
+        content.className = "event-content";
+
+        const title = document.createElement("h3");
+        title.textContent = event.title;
+
+        const meta = document.createElement("p");
+        meta.className = "event-meta";
+        meta.textContent =
+            `📅 ${formatDate(event.date)} · ${event.time}\n` +
+            `📍 ${event.venue}\n` +
+            `👤 ${reg.name} · ${reg.department}`;
+        meta.style.whiteSpace = "pre-line";
+
+        const cancel = createButton(
+            "Cancel Registration",
+            "danger-btn",
+            () => cancelRegistration(reg.id)
+        );
+
+        content.append(title, meta, cancel);
+        card.append(banner, content);
+        container.appendChild(card);
+    });
+
+    if (container.children.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "The registered events are no longer available.";
+        container.appendChild(empty);
+    }
+}
+
+function cancelRegistration(id) {
+    if (!confirm("Cancel this event registration?")) return;
+
+    const oldRegistrations = registrations;
+    registrations = registrations.filter(reg => reg.id !== id);
+
+    if (!saveData()) {
+        registrations = oldRegistrations;
+        return;
+    }
+
+    showToast("Registration cancelled.");
+    renderAll();
+    renderMyRegistrations();
+}
+
+$("lookupBtn").addEventListener("click", renderMyRegistrations);
+
+$("myEmail").addEventListener("keydown", event => {
+    if (event.key === "Enter") renderMyRegistrations();
+});
+
+// ---------- Add and delete events ----------
+
+$("eventForm").addEventListener("submit", event => {
+    event.preventDefault();
+
+    const title = $("eventTitle").value.trim();
+    const category = $("eventCategory").value;
+    const date = $("eventDate").value;
+    const time = $("eventTime").value;
+    const venue = $("eventVenue").value.trim();
+    const capacity = Number($("eventCapacity").value);
+    const description = $("eventDescription").value.trim();
+
+    if (!title || !date || !time || !venue ||
+        !description || !Number.isInteger(capacity) ||
+        capacity < 1 || capacity > 10000) {
+        showToast("Please enter valid event details.");
+        return;
+    }
+
+    if (date < new Date().toISOString().slice(0, 10)) {
+        showToast("Choose today or a future date.");
+        return;
+    }
+
+    const newEvent = {
+        id: "evt_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
+        title,
+        category,
+        date,
+        time,
+        venue,
+        capacity,
+        description,
+        emoji: getEmoji(category)
+    };
+
+    events.push(newEvent);
+
+    if (!saveData()) {
+        events.pop();
+        return;
+    }
+
+    $("eventForm").reset();
+    $("eventCapacity").value = 100;
+
+    showToast("New event added successfully!");
+    renderAll();
+    renderAdminTable();
+});
+
+function renderAdminTable() {
+    const table = $("adminTable");
+    table.replaceChildren();
+
+    if (events.length === 0) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 4;
+        cell.textContent = "No events to manage.";
+        row.appendChild(cell);
+        table.appendChild(row);
+        return;
+    }
+
+    events.forEach(event => {
+        const row = document.createElement("tr");
+
+        const title = document.createElement("td");
+        title.textContent = event.title;
+
+        const date = document.createElement("td");
+        date.textContent = formatDate(event.date);
+
+        const count = document.createElement("td");
+        count.textContent =
+            `${getEventRegistrations(event.id).length}/${event.capacity}`;
+
+        const action = document.createElement("td");
+        const del = createButton("Delete", "danger-btn", () => {
+            deleteEvent(event.id);
+        });
+
+        action.appendChild(del);
+        row.append(title, date, count, action);
+        table.appendChild(row);
+    });
+}
+
+function deleteEvent(id) {
+    const event = events.find(item => item.id === id);
+    if (!event) return;
+
+    if (!confirm(
+        `Delete "${event.title}" and all registrations for it?`
+    )) return;
+
+    const oldEvents = events;
+    const oldRegistrations = registrations;
+    const oldFavorites = favorites;
+
+    events = events.filter(item => item.id !== id);
+    registrations = registrations.filter(reg => reg.eventId !== id);
+    favorites = favorites.filter(favoriteId => favoriteId !== id);
+
+    if (!saveData()) {
+        events = oldEvents;
+        registrations = oldRegistrations;
+        favorites = oldFavorites;
+        return;
+    }
+
+    showToast("Event deleted.");
+    renderAll();
+    renderAdminTable();
+    renderMyRegistrations();
+}
+
+// ---------- Navigation ----------
+
+document.querySelectorAll("nav button").forEach(button => {
+    button.addEventListener("click", () => {
+        document.querySelectorAll("nav button").forEach(item => {
+            item.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        document.querySelectorAll(".page").forEach(page => {
+            page.hidden = page.id !== button.dataset.page;
+        });
+
+        if (button.dataset.page === "adminPage") renderAdminTable();
+        if (button.dataset.page === "registrationsPage") {
+            renderMyRegistrations();
+        }
+    });
+});
+
+// ---------- Search, filtering, and rendering ----------
+
+$("searchInput").addEventListener("input", renderEvents);
+$("categoryFilter").addEventListener("change", renderEvents);
+$("sortFilter").addEventListener("change", renderEvents);
+
+function renderAll() {
+    renderStats();
+    renderEvents();
+    renderAdminTable();
+}
+
+renderAll();
+</script>
+
+</body>
+</html>
