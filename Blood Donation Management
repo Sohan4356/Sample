@@ -1,0 +1,641 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blood Donation Management</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f6fa;
+    color: #222;
+}
+
+header {
+    background: #b5122b;
+    color: white;
+    padding: 22px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+header h1 {
+    font-size: 23px;
+}
+
+header p {
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px #0000000d;
+}
+
+.stat-card h3 {
+    color: #777;
+    font-size: 14px;
+}
+
+.stat-card p {
+    font-size: 30px;
+    font-weight: bold;
+    color: #b5122b;
+    margin-top: 12px;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.tabs button {
+    background: white;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 11px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.tabs button.active,
+.tabs button:hover {
+    background: #b5122b;
+    color: white;
+}
+
+.section {
+    display: none;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px #0000000d;
+}
+
+.section.active {
+    display: block;
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 21px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    outline: none;
+    font-size: 14px;
+    background: white;
+}
+
+input:focus, select:focus {
+    border-color: #b5122b;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+.primary {
+    background: #b5122b;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.primary:hover {
+    background: #8e0e22;
+}
+
+.search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.search-row input {
+    flex: 1;
+    min-width: 180px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+th, td {
+    padding: 13px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+th {
+    background: #fff0f2;
+    color: #9f1027;
+}
+
+.delete {
+    background: #ffe2e5;
+    color: #b5122b;
+    border: none;
+    padding: 7px 11px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.status {
+    padding: 5px 9px;
+    border-radius: 15px;
+    font-size: 12px;
+    background: #fff0d8;
+    color: #936000;
+}
+
+.status.Fulfilled {
+    background: #dff7e6;
+    color: #18733a;
+}
+
+.status.Cancelled {
+    background: #ffe2e5;
+    color: #a20e25;
+}
+
+.empty {
+    text-align: center;
+    color: #888;
+    padding: 25px;
+}
+
+@media(max-width: 650px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full {
+        grid-column: auto;
+    }
+
+    .container {
+        width: 94%;
+    }
+
+    .section {
+        padding: 16px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div>
+        <h1>🩸 LifeLine Blood Bank</h1>
+        <p>Blood Donation Management System</p>
+    </div>
+    <strong>Donate Blood, Save Lives ❤️</strong>
+</header>
+
+<div class="container">
+
+    <!-- Dashboard -->
+    <div class="stats">
+        <div class="stat-card">
+            <h3>Total Donors</h3>
+            <p id="totalDonors">0</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Blood Requests</h3>
+            <p id="totalRequests">0</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Pending Requests</h3>
+            <p id="pendingRequests">0</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Blood Units Recorded</h3>
+            <p id="totalUnits">0</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="tabs">
+        <button class="active" onclick="showTab('donors', this)">Donors</button>
+        <button onclick="showTab('addDonor', this)">Add Donor</button>
+        <button onclick="showTab('requests', this)">Blood Requests</button>
+        <button onclick="showTab('addRequest', this)">New Request</button>
+    </div>
+
+    <!-- Donor List -->
+    <section id="donors" class="section active">
+        <h2>Registered Donors</h2>
+
+        <div class="search-row">
+            <input id="searchDonor"
+                   placeholder="Search by name, city or blood group..."
+                   oninput="renderDonors()">
+
+            <select id="bloodFilter" onchange="renderDonors()">
+                <option value="">All Blood Groups</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+                <option>O+</option>
+                <option>O-</option>
+            </select>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Blood Group</th>
+                        <th>Phone</th>
+                        <th>City</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="donorTable"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Add Donor -->
+    <section id="addDonor" class="section">
+        <h2>Register New Donor</h2>
+
+        <form id="donorForm" class="form-grid">
+            <input id="donorName" placeholder="Full Name" required maxlength="60">
+
+            <input id="donorAge" type="number"
+                   placeholder="Age" min="18" max="65" required>
+
+            <select id="donorBlood" required>
+                <option value="">Select Blood Group</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+                <option>O+</option>
+                <option>O-</option>
+            </select>
+
+            <input id="donorPhone" type="tel"
+                   placeholder="10-digit Phone Number"
+                   pattern="[6-9][0-9]{9}" required>
+
+            <input id="donorCity" placeholder="City" required maxlength="60">
+
+            <button class="primary full" type="submit">
+                Register Donor
+            </button>
+        </form>
+    </section>
+
+    <!-- Blood Requests -->
+    <section id="requests" class="section">
+        <h2>Blood Requests</h2>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Patient Name</th>
+                        <th>Blood Group</th>
+                        <th>Units</th>
+                        <th>Hospital</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="requestTable"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Add Request -->
+    <section id="addRequest" class="section">
+        <h2>Create Blood Request</h2>
+
+        <form id="requestForm" class="form-grid">
+            <input id="patientName" placeholder="Patient Name" required maxlength="60">
+
+            <select id="requestBlood" required>
+                <option value="">Select Blood Group</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+                <option>O+</option>
+                <option>O-</option>
+            </select>
+
+            <input id="requestUnits" type="number"
+                   placeholder="Required Units" min="1" max="20" required>
+
+            <input id="hospital" placeholder="Hospital Name" required maxlength="100">
+
+            <button class="primary full" type="submit">
+                Submit Request
+            </button>
+        </form>
+    </section>
+
+</div>
+
+<script>
+// Load saved data
+let donors = JSON.parse(localStorage.getItem("bloodDonors")) || [];
+let requests = JSON.parse(localStorage.getItem("bloodRequests")) || [];
+
+// Save data
+function saveData() {
+    localStorage.setItem("bloodDonors", JSON.stringify(donors));
+    localStorage.setItem("bloodRequests", JSON.stringify(requests));
+    updateDashboard();
+}
+
+// Navigation
+function showTab(id, button) {
+    document.querySelectorAll(".section").forEach(section => {
+        section.classList.remove("active");
+    });
+
+    document.querySelectorAll(".tabs button").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    document.getElementById(id).classList.add("active");
+    button.classList.add("active");
+}
+
+// Dashboard statistics
+function updateDashboard() {
+    document.getElementById("totalDonors").textContent = donors.length;
+    document.getElementById("totalRequests").textContent = requests.length;
+
+    document.getElementById("pendingRequests").textContent =
+        requests.filter(r => r.status === "Pending").length;
+
+    // This counts requested units, not verified physical blood inventory.
+    document.getElementById("totalUnits").textContent =
+        donors.reduce((sum, donor) => sum + donor.units, 0);
+}
+
+// Add donor
+document.getElementById("donorForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const donor = {
+        id: Date.now(),
+        name: document.getElementById("donorName").value.trim(),
+        age: Number(document.getElementById("donorAge").value),
+        blood: document.getElementById("donorBlood").value,
+        phone: document.getElementById("donorPhone").value.trim(),
+        city: document.getElementById("donorCity").value.trim(),
+        units: 1
+    };
+
+    if (donor.age < 18 || donor.age > 65) {
+        alert("Please enter an age between 18 and 65.");
+        return;
+    }
+
+    if (!/^[6-9]\d{9}$/.test(donor.phone)) {
+        alert("Enter a valid 10-digit Indian mobile number.");
+        return;
+    }
+
+    donors.push(donor);
+    saveData();
+    renderDonors();
+
+    this.reset();
+    alert("Donor registered successfully!");
+});
+
+// Display donors
+function renderDonors() {
+    const search = document.getElementById("searchDonor").value.toLowerCase();
+    const blood = document.getElementById("bloodFilter").value;
+
+    const filtered = donors.filter(donor => {
+        const matchesSearch =
+            donor.name.toLowerCase().includes(search) ||
+            donor.city.toLowerCase().includes(search) ||
+            donor.blood.toLowerCase().includes(search);
+
+        return matchesSearch && (!blood || donor.blood === blood);
+    });
+
+    const table = document.getElementById("donorTable");
+    table.innerHTML = "";
+
+    if (filtered.length === 0) {
+        table.innerHTML =
+            '<tr><td colspan="6" class="empty">No donors found.</td></tr>';
+        return;
+    }
+
+    filtered.forEach(donor => {
+        const row = document.createElement("tr");
+
+        [
+            donor.name,
+            donor.age,
+            donor.blood,
+            donor.phone,
+            donor.city
+        ].forEach(value => {
+            const td = document.createElement("td");
+            td.textContent = value;
+            row.appendChild(td);
+        });
+
+        const action = document.createElement("td");
+        const button = document.createElement("button");
+
+        button.textContent = "Delete";
+        button.className = "delete";
+        button.addEventListener("click", () => deleteDonor(donor.id));
+
+        action.appendChild(button);
+        row.appendChild(action);
+        table.appendChild(row);
+    });
+}
+
+// Delete donor
+function deleteDonor(id) {
+    if (!confirm("Are you sure you want to delete this donor?")) return;
+
+    donors = donors.filter(d => d.id !== id);
+    saveData();
+    renderDonors();
+}
+
+// Add blood request
+document.getElementById("requestForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const request = {
+        id: Date.now(),
+        patient: document.getElementById("patientName").value.trim(),
+        blood: document.getElementById("requestBlood").value,
+        units: Number(document.getElementById("requestUnits").value),
+        hospital: document.getElementById("hospital").value.trim(),
+        status: "Pending"
+    };
+
+    if (request.units < 1 || request.units > 20) {
+        alert("Enter a valid number of units.");
+        return;
+    }
+
+    requests.push(request);
+    saveData();
+    renderRequests();
+
+    this.reset();
+    alert("Blood request submitted successfully!");
+});
+
+// Display requests
+function renderRequests() {
+    const table = document.getElementById("requestTable");
+    table.innerHTML = "";
+
+    if (requests.length === 0) {
+        table.innerHTML =
+            '<tr><td colspan="6" class="empty">No blood requests yet.</td></tr>';
+        return;
+    }
+
+    requests.forEach(request => {
+        const row = document.createElement("tr");
+
+        [
+            request.patient,
+            request.blood,
+            request.units,
+            request.hospital
+        ].forEach(value => {
+            const td = document.createElement("td");
+            td.textContent = value;
+            row.appendChild(td);
+        });
+
+        const statusCell = document.createElement("td");
+        const badge = document.createElement("span");
+        badge.className = "status " + request.status;
+        badge.textContent = request.status;
+        statusCell.appendChild(badge);
+        row.appendChild(statusCell);
+
+        const actionCell = document.createElement("td");
+
+        if (request.status === "Pending") {
+            const fulfill = document.createElement("button");
+            fulfill.textContent = "Fulfill";
+            fulfill.className = "primary";
+            fulfill.addEventListener("click", () => {
+                updateRequest(request.id, "Fulfilled");
+            });
+
+            const cancel = document.createElement("button");
+            cancel.textContent = "Cancel";
+            cancel.className = "delete";
+            cancel.style.marginLeft = "5px";
+            cancel.addEventListener("click", () => {
+                updateRequest(request.id, "Cancelled");
+            });
+
+            actionCell.append(fulfill, cancel);
+        } else {
+            actionCell.textContent = "No action";
+        }
+
+        row.appendChild(actionCell);
+        table.appendChild(row);
+    });
+}
+
+// Update request status
+function updateRequest(id, status) {
+    const request = requests.find(r => r.id === id);
+    if (!request) return;
+
+    request.status = status;
+    saveData();
+    renderRequests();
+}
+
+// Initial rendering
+updateDashboard();
+renderDonors();
+renderRequests();
+</script>
+
+</body>
+</html>
