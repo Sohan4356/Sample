@@ -1,0 +1,963 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plagiarism Checker</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f5f6fc;
+    color: #24243a;
+}
+
+header {
+    background: #29254b;
+    color: white;
+    padding: 22px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.logo {
+    font-size: 23px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #a99aff;
+}
+
+header p {
+    font-size: 13px;
+    color: #d2cfee;
+    margin-top: 5px;
+}
+
+.container {
+    max-width: 1200px;
+    width: 90%;
+    margin: 35px auto;
+}
+
+.intro {
+    margin-bottom: 25px;
+}
+
+.intro h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.intro p {
+    color: #777;
+    line-height: 1.6;
+}
+
+.editor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.panel {
+    background: white;
+    border-radius: 13px;
+    padding: 20px;
+    box-shadow: 0 4px 15px #0000000a;
+}
+
+.panel-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.panel-heading h2 {
+    font-size: 17px;
+}
+
+.panel-heading span {
+    color: #888;
+    font-size: 12px;
+}
+
+textarea {
+    width: 100%;
+    height: 240px;
+    resize: vertical;
+    padding: 15px;
+    border: 1px solid #deddeb;
+    border-radius: 9px;
+    font-size: 14px;
+    line-height: 1.7;
+    outline: none;
+}
+
+textarea:focus {
+    border-color: #7965df;
+    box-shadow: 0 0 0 3px #7965df18;
+}
+
+.word-info {
+    display: flex;
+    justify-content: space-between;
+    color: #888;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 25px 0;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+    padding: 12px 20px;
+    border-radius: 7px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+.primary {
+    background: #6955d4;
+    color: white;
+}
+
+.secondary {
+    background: #eae7ff;
+    color: #5945bf;
+}
+
+.neutral {
+    background: #e9e9f0;
+    color: #444;
+}
+
+.results {
+    display: none;
+}
+
+.results.show {
+    display: block;
+}
+
+.result-heading {
+    margin-bottom: 18px;
+}
+
+.result-heading h2 {
+    font-size: 22px;
+    margin-bottom: 6px;
+}
+
+.result-heading p {
+    color: #777;
+    font-size: 13px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px #00000008;
+}
+
+.stat h3 {
+    font-size: 13px;
+    color: #777;
+}
+
+.stat p {
+    font-size: 26px;
+    color: #6551cf;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.score-card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.score-circle {
+    width: 125px;
+    height: 125px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: conic-gradient(#755fe0 0%, #e8e5f5 0%);
+    flex-shrink: 0;
+}
+
+.score-inner {
+    width: 100px;
+    height: 100px;
+    background: white;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    text-align: center;
+}
+
+.score-inner strong {
+    font-size: 27px;
+    color: #6551cf;
+}
+
+.score-inner small {
+    font-size: 10px;
+    color: #888;
+}
+
+.score-description h3 {
+    margin-bottom: 8px;
+}
+
+.score-description p {
+    color: #777;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.result-box {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px #00000008;
+}
+
+.result-box h3 {
+    margin-bottom: 15px;
+}
+
+.match-item {
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    line-height: 1.6;
+}
+
+.match-item p {
+    font-size: 13px;
+    margin-top: 7px;
+    color: #555;
+}
+
+.match-score {
+    color: #6551cf;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+mark {
+    background: #fff0a8;
+    padding: 1px 3px;
+    border-radius: 3px;
+}
+
+.no-match {
+    color: #777;
+    font-size: 14px;
+    padding: 10px 0;
+}
+
+.preview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.preview {
+    border: 1px solid #eee;
+    border-radius: 9px;
+    padding: 15px;
+    line-height: 1.8;
+    font-size: 13px;
+    color: #555;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.preview h4 {
+    margin-bottom: 10px;
+    color: #29254b;
+}
+
+.note {
+    background: #fff8e5;
+    border-left: 4px solid #e9b84e;
+    padding: 13px;
+    margin-top: 15px;
+    color: #725c28;
+    font-size: 12px;
+    line-height: 1.6;
+    border-radius: 5px;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #888;
+    font-size: 12px;
+}
+
+@media(max-width: 750px) {
+    .editor-grid,
+    .preview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .container {
+        width: 94%;
+    }
+
+    .score-card {
+        justify-content: center;
+        text-align: center;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div>
+        <div class="logo">Check<span>Mate.</span></div>
+        <p>Smart Text Similarity Checker</p>
+    </div>
+    <strong>📝 Plagiarism Detection Tool</strong>
+</header>
+
+<main class="container">
+
+    <div class="intro">
+        <h1>Plagiarism Checker</h1>
+        <p>Compare two documents and discover matching content instantly.</p>
+    </div>
+
+    <!-- Text editors -->
+    <div class="editor-grid">
+
+        <div class="panel">
+            <div class="panel-heading">
+                <h2>📄 Original Document</h2>
+                <span>Document 1</span>
+            </div>
+
+            <textarea id="text1"
+                placeholder="Paste your original document here..."></textarea>
+
+            <div class="word-info">
+                <span id="words1">0 words</span>
+                <span id="sentences1">0 sentences</span>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-heading">
+                <h2>📋 Comparison Document</h2>
+                <span>Document 2</span>
+            </div>
+
+            <textarea id="text2"
+                placeholder="Paste the document you want to compare..."></textarea>
+
+            <div class="word-info">
+                <span id="words2">0 words</span>
+                <span id="sentences2">0 sentences</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Buttons -->
+    <div class="controls">
+        <button class="primary" onclick="analyzeText()">
+            🔍 Check Similarity
+        </button>
+
+        <button class="secondary" onclick="loadSample()">
+            Load Sample
+        </button>
+
+        <button class="neutral" onclick="swapTexts()">
+            ⇄ Swap Text
+        </button>
+
+        <button class="neutral" onclick="clearTexts()">
+            Clear All
+        </button>
+    </div>
+
+    <!-- Results -->
+    <section class="results" id="results">
+
+        <div class="result-heading">
+            <h2>Analysis Results</h2>
+            <p>Here is the comparison of your two documents.</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <h3>Document 1 Words</h3>
+                <p id="resultWords1">0</p>
+            </div>
+
+            <div class="stat">
+                <h3>Document 2 Words</h3>
+                <p id="resultWords2">0</p>
+            </div>
+
+            <div class="stat">
+                <h3>Matched Sentences</h3>
+                <p id="matchedCount">0</p>
+            </div>
+
+            <div class="stat">
+                <h3>Common Words</h3>
+                <p id="commonCount">0</p>
+            </div>
+        </div>
+
+        <div class="score-card">
+            <div class="score-circle" id="scoreCircle">
+                <div class="score-inner">
+                    <div>
+                        <strong id="score">0%</strong>
+                        <br>
+                        <small>SIMILARITY</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="score-description">
+                <h3 id="scoreTitle">Analysis Complete</h3>
+                <p id="scoreDescription">
+                    Your similarity result will appear here.
+                </p>
+            </div>
+        </div>
+
+        <div class="result-box">
+            <h3>🔎 Matching Sentences</h3>
+            <div id="matches">
+                <p class="no-match">No matching sentences found.</p>
+            </div>
+        </div>
+
+        <div class="result-box">
+            <h3>🖍 Highlighted Document Comparison</h3>
+
+            <div class="preview-grid">
+                <div class="preview">
+                    <h4>Original Document</h4>
+                    <div id="preview1"></div>
+                </div>
+
+                <div class="preview">
+                    <h4>Comparison Document</h4>
+                    <div id="preview2"></div>
+                </div>
+            </div>
+
+            <div class="note">
+                Yellow highlights indicate words shared by both documents.
+                Common everyday words are ignored during highlighting.
+                Highlighting alone does not prove plagiarism.
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="primary" onclick="downloadReport()">
+                ⬇ Download Report
+            </button>
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    CheckMate Plagiarism Checker | Educational Project
+</footer>
+
+<script>
+
+// Get HTML elements
+const text1 = document.getElementById("text1");
+const text2 = document.getElementById("text2");
+
+let latestReport = null;
+
+// Words ignored during comparison
+const stopWords = new Set([
+    "the", "is", "am", "are", "was", "were",
+    "a", "an", "and", "or", "but", "of", "to",
+    "in", "on", "at", "for", "with", "by",
+    "this", "that", "it", "as", "be", "from",
+    "has", "have", "had", "do", "does", "did",
+    "can", "could", "will", "would", "should",
+    "we", "they", "he", "she", "i", "you",
+    "their", "our", "your", "its", "not",
+    "if", "then", "than", "so", "such"
+]);
+
+// Get meaningful words
+function getWords(text) {
+    return text.toLowerCase().match(/[a-z0-9]+/g) || [];
+}
+
+// Get meaningful words without common words
+function getImportantWords(text) {
+    return getWords(text).filter(word => !stopWords.has(word));
+}
+
+// Split text into sentences
+function getSentences(text) {
+    return text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)
+        ?.map(sentence => sentence.trim())
+        .filter(sentence => sentence.length > 0) || [];
+}
+
+// Calculate cosine similarity using TF-IDF-like weighting
+function calculateSimilarity(wordsA, wordsB) {
+
+    const frequencyA = {};
+    const frequencyB = {};
+
+    wordsA.forEach(word => {
+        frequencyA[word] = (frequencyA[word] || 0) + 1;
+    });
+
+    wordsB.forEach(word => {
+        frequencyB[word] = (frequencyB[word] || 0) + 1;
+    });
+
+    const allWords = new Set([
+        ...Object.keys(frequencyA),
+        ...Object.keys(frequencyB)
+    ]);
+
+    let dotProduct = 0;
+    let magnitudeA = 0;
+    let magnitudeB = 0;
+
+    allWords.forEach(word => {
+
+        const a = frequencyA[word] || 0;
+        const b = frequencyB[word] || 0;
+
+        // Give rare words more weight
+        const documentFrequency =
+            (a > 0 ? 1 : 0) + (b > 0 ? 1 : 0);
+
+        const weight = Math.log(3 / (1 + documentFrequency)) + 1;
+
+        const weightedA = a * weight;
+        const weightedB = b * weight;
+
+        dotProduct += weightedA * weightedB;
+        magnitudeA += weightedA * weightedA;
+        magnitudeB += weightedB * weightedB;
+    });
+
+    if (magnitudeA === 0 || magnitudeB === 0) {
+        return 0;
+    }
+
+    return dotProduct / (Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB));
+}
+
+// Calculate sentence overlap
+function sentenceSimilarity(sentenceA, sentenceB) {
+
+    const wordsA = new Set(getImportantWords(sentenceA));
+    const wordsB = new Set(getImportantWords(sentenceB));
+
+    if (wordsA.size === 0 || wordsB.size === 0) {
+        return 0;
+    }
+
+    let common = 0;
+
+    wordsA.forEach(word => {
+        if (wordsB.has(word)) common++;
+    });
+
+    const union = new Set([...wordsA, ...wordsB]).size;
+
+    return common / union;
+}
+
+// Update word and sentence counters
+function updateCounters() {
+
+    const a = text1.value;
+    const b = text2.value;
+
+    document.getElementById("words1").textContent =
+        getWords(a).length + " words";
+
+    document.getElementById("words2").textContent =
+        getWords(b).length + " words";
+
+    document.getElementById("sentences1").textContent =
+        getSentences(a).length + " sentences";
+
+    document.getElementById("sentences2").textContent =
+        getSentences(b).length + " sentences";
+}
+
+text1.addEventListener("input", updateCounters);
+text2.addEventListener("input", updateCounters);
+
+// Main analysis function
+function analyzeText() {
+
+    const a = text1.value.trim();
+    const b = text2.value.trim();
+
+    if (!a || !b) {
+        alert("Please enter text in both documents.");
+        return;
+    }
+
+    const wordsA = getImportantWords(a);
+    const wordsB = getImportantWords(b);
+
+    if (!wordsA.length || !wordsB.length) {
+        alert("Please enter documents with meaningful words.");
+        return;
+    }
+
+    // Overall similarity
+    const similarity = calculateSimilarity(wordsA, wordsB);
+    const percentage = Math.round(similarity * 100);
+
+    // Count common unique words
+    const setA = new Set(wordsA);
+    const setB = new Set(wordsB);
+
+    const commonWords = [...setA].filter(word => setB.has(word));
+
+    // Find matching sentences
+    const sentencesA = getSentences(a);
+    const sentencesB = getSentences(b);
+
+    const matchedPairs = [];
+
+    sentencesA.forEach(sentenceA => {
+
+        sentencesB.forEach(sentenceB => {
+
+            const score = sentenceSimilarity(sentenceA, sentenceB);
+
+            if (score >= 0.45) {
+                matchedPairs.push({
+                    first: sentenceA,
+                    second: sentenceB,
+                    score: Math.round(score * 100)
+                });
+            }
+
+        });
+
+    });
+
+    // Display statistics
+    document.getElementById("resultWords1").textContent =
+        getWords(a).length;
+
+    document.getElementById("resultWords2").textContent =
+        getWords(b).length;
+
+    document.getElementById("matchedCount").textContent =
+        matchedPairs.length;
+
+    document.getElementById("commonCount").textContent =
+        commonWords.length;
+
+    document.getElementById("score").textContent =
+        percentage + "%";
+
+    // Update score circle
+    document.getElementById("scoreCircle").style.background =
+        `conic-gradient(#755fe0 ${percentage}%, #e8e5f5 ${percentage}%)`;
+
+    // Score description
+    let title;
+    let description;
+
+    if (percentage >= 70) {
+        title = "High Text Similarity";
+        description =
+            "The two documents share a high proportion of meaningful words. Review the matched content carefully.";
+    } else if (percentage >= 35) {
+        title = "Moderate Text Similarity";
+        description =
+            "The documents share some content. Check the highlighted words and sentence matches.";
+    } else {
+        title = "Low Text Similarity";
+        description =
+            "The documents have relatively few shared meaningful words.";
+    }
+
+    document.getElementById("scoreTitle").textContent = title;
+    document.getElementById("scoreDescription").textContent = description;
+
+    // Display matching sentences
+    const matches = document.getElementById("matches");
+    matches.innerHTML = "";
+
+    if (matchedPairs.length === 0) {
+
+        const message = document.createElement("p");
+        message.className = "no-match";
+        message.textContent = "No sufficiently similar sentences found.";
+
+        matches.appendChild(message);
+
+    } else {
+
+        matchedPairs.sort((x, y) => y.score - x.score);
+
+        matchedPairs.slice(0, 30).forEach((pair, index) => {
+
+            const item = document.createElement("div");
+            item.className = "match-item";
+
+            const heading = document.createElement("strong");
+            heading.textContent = "Match " + (index + 1);
+
+            const score = document.createElement("div");
+            score.className = "match-score";
+            score.textContent = pair.score + "% sentence similarity";
+
+            const first = document.createElement("p");
+            first.textContent = "Document 1: " + pair.first;
+
+            const second = document.createElement("p");
+            second.textContent = "Document 2: " + pair.second;
+
+            item.append(heading, score, first, second);
+            matches.appendChild(item);
+        });
+    }
+
+    // Highlight common words
+    renderHighlights(a, b, commonWords);
+
+    // Save latest report data
+    latestReport = {
+        percentage,
+        wordsA: getWords(a).length,
+        wordsB: getWords(b).length,
+        commonWords,
+        matchedPairs,
+        title,
+        description
+    };
+
+    document.getElementById("results").classList.add("show");
+
+    document.getElementById("results").scrollIntoView({
+        behavior: "smooth"
+    });
+}
+
+// Highlight shared meaningful words
+function renderHighlights(a, b, commonWords) {
+
+    const commonSet = new Set(commonWords);
+
+    function highlight(text) {
+
+        const parts = text.split(/([a-zA-Z0-9]+)/g);
+
+        return parts.map(part => {
+
+            const normalized = part.toLowerCase();
+
+            if (commonSet.has(normalized)) {
+                return "<mark>" + escapeHTML(part) + "</mark>";
+            }
+
+            return escapeHTML(part);
+
+        }).join("");
+    }
+
+    document.getElementById("preview1").innerHTML =
+        highlight(a).replace(/\n/g, "<br>");
+
+    document.getElementById("preview2").innerHTML =
+        highlight(b).replace(/\n/g, "<br>");
+}
+
+// Prevent HTML injection in document previews
+function escapeHTML(value) {
+
+    return value.replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+// Load sample documents
+function loadSample() {
+
+    text1.value =
+`Artificial intelligence is changing the world.
+Technology helps people solve complex problems.
+Machine learning is an important part of artificial intelligence.
+Students can use technology to improve their knowledge.`;
+
+    text2.value =
+`Artificial intelligence is transforming our world.
+Technology helps people solve difficult problems.
+Machine learning is a major part of artificial intelligence.
+Education and technology help students improve their knowledge.`;
+
+    updateCounters();
+    analyzeText();
+}
+
+// Swap document text
+function swapTexts() {
+
+    const temporary = text1.value;
+
+    text1.value = text2.value;
+    text2.value = temporary;
+
+    updateCounters();
+}
+
+// Clear documents
+function clearTexts() {
+
+    if (!confirm("Are you sure you want to clear both documents?")) {
+        return;
+    }
+
+    text1.value = "";
+    text2.value = "";
+
+    document.getElementById("results").classList.remove("show");
+
+    latestReport = null;
+
+    updateCounters();
+}
+
+// Download analysis report
+function downloadReport() {
+
+    if (!latestReport) {
+        alert("Please analyze the documents first.");
+        return;
+    }
+
+    const report = `
+PLAGIARISM CHECKER REPORT
+========================
+
+Overall Similarity: ${latestReport.percentage}%
+
+Document 1 Words: ${latestReport.wordsA}
+Document 2 Words: ${latestReport.wordsB}
+
+Common Unique Words: ${latestReport.commonWords.length}
+
+Matching Sentences: ${latestReport.matchedPairs.length}
+
+RESULT: ${latestReport.title}
+
+DESCRIPTION:
+${latestReport.description}
+
+COMMON WORDS:
+${latestReport.commonWords.join(", ")}
+
+MATCHED SENTENCES:
+${latestReport.matchedPairs.map((pair, index) =>
+    `\nMatch ${index + 1} (${pair.score}%):
+Document 1: ${pair.first}
+Document 2: ${pair.second}`
+).join("\n")}
+
+NOTE:
+This is an educational text similarity estimate.
+It does not establish plagiarism or verify external sources.
+`;
+
+    const blob = new Blob([report], {
+        type: "text/plain"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "plagiarism-report.txt";
+
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+
+// Initial counters
+updateCounters();
+
+</script>
+
+</body>
+</html>
