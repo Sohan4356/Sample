@@ -1,0 +1,1194 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Home Automation</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+:root {
+    --bg: #101827;
+    --panel: #1b2638;
+    --panel2: #222f43;
+    --text: #f4f6fc;
+    --muted: #9ba9bd;
+    --accent: #6d9cff;
+    --green: #42d6a4;
+    --border: #344157;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+header {
+    padding: 22px 5%;
+    background: #182338;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    background: #304a76;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 24px;
+}
+
+.brand h1 {
+    font-size: 21px;
+}
+
+.brand p {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.connection {
+    color: var(--green);
+    font-size: 13px;
+}
+
+.container {
+    max-width: 1250px;
+    width: 92%;
+    margin: 30px auto;
+}
+
+.welcome {
+    margin-bottom: 25px;
+}
+
+.welcome h2 {
+    font-size: 26px;
+    margin-bottom: 7px;
+}
+
+.welcome p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 25px;
+}
+
+.summary-card {
+    background: var(--panel);
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+}
+
+.summary-card .icon {
+    font-size: 23px;
+}
+
+.summary-card h3 {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 12px;
+}
+
+.summary-card p {
+    font-size: 25px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.summary-card small {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: 28px 0 16px;
+    flex-wrap: wrap;
+}
+
+.section-heading h2 {
+    font-size: 19px;
+}
+
+button, select {
+    cursor: pointer;
+    font: inherit;
+}
+
+select {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px;
+    border-radius: 7px;
+}
+
+.rooms {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.room-btn {
+    padding: 10px 17px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--muted);
+}
+
+.room-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.device-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 17px;
+}
+
+.device {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-radius: 13px;
+    transition: .2s;
+}
+
+.device.on {
+    border-color: #547fca;
+}
+
+.device-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.device-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    font-size: 25px;
+    background: var(--panel2);
+    border-radius: 12px;
+}
+
+.status {
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    background: #3a4351;
+    color: #c1c9d5;
+}
+
+.status.on {
+    background: #164c43;
+    color: #6ce9bd;
+}
+
+.device h3 {
+    font-size: 17px;
+    margin-top: 18px;
+}
+
+.device .room-name {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.device-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.device-power {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.toggle {
+    width: 48px;
+    height: 26px;
+    border-radius: 30px;
+    background: #495467;
+    border: none;
+    position: relative;
+    transition: .2s;
+}
+
+.toggle::after {
+    content: "";
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    transition: .2s;
+}
+
+.toggle.active {
+    background: var(--green);
+}
+
+.toggle.active::after {
+    left: 25px;
+}
+
+.device-control {
+    margin-top: 17px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+}
+
+.device-control label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.device-control input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+}
+
+.control-value {
+    font-size: 13px;
+    color: var(--green);
+    margin-top: 6px;
+}
+
+.environment-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 17px;
+}
+
+.environment-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 22px;
+}
+
+.environment-card h3 {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.environment-value {
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 12px;
+}
+
+.environment-card p {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 7px;
+}
+
+.energy-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 22px;
+    margin-top: 18px;
+}
+
+.energy-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.energy-header h3 {
+    font-size: 16px;
+}
+
+.energy-header strong {
+    font-size: 23px;
+    color: var(--green);
+}
+
+.progress-track {
+    width: 100%;
+    height: 11px;
+    border-radius: 20px;
+    background: #354156;
+    margin: 20px 0 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #4a9eff, #42d6a4);
+    border-radius: 20px;
+    transition: width .3s;
+}
+
+.energy-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.action-btn {
+    border: none;
+    padding: 12px 17px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.off-btn {
+    background: #f16c7a;
+    color: white;
+}
+
+.on-btn {
+    background: var(--green);
+    color: #102a25;
+}
+
+.reset-btn {
+    background: var(--panel2);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.activity {
+    margin-top: 28px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-radius: 13px;
+}
+
+.activity h3 {
+    margin-bottom: 15px;
+}
+
+.activity-list {
+    display: grid;
+    gap: 12px;
+}
+
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 11px;
+    font-size: 13px;
+}
+
+.activity-item span:last-child {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.empty {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+footer {
+    text-align: center;
+    color: var(--muted);
+    padding: 30px;
+    font-size: 12px;
+}
+
+.toast {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #263a52;
+    border: 1px solid #4e6d8e;
+    padding: 13px 18px;
+    border-radius: 8px;
+    display: none;
+    color: white;
+    z-index: 10;
+}
+
+@media(max-width: 900px) {
+    .device-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 550px) {
+    .device-grid,
+    .environment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .container {
+        width: 94%;
+    }
+
+    header {
+        padding: 18px 4%;
+    }
+
+    .welcome h2 {
+        font-size: 22px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="brand">
+        <div class="brand-icon">🏠</div>
+        <div>
+            <h1>SmartHome</h1>
+            <p>Home Automation Dashboard</p>
+        </div>
+    </div>
+
+    <div class="header-right">
+        <span class="connection">● Demo System Online</span>
+        <span id="clock">--:--:--</span>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="welcome">
+        <h2>Welcome Home 👋</h2>
+        <p>Monitor and control your smart home devices from one place.</p>
+    </section>
+
+    <!-- Summary -->
+    <section class="summary">
+
+        <div class="summary-card">
+            <div class="icon">📱</div>
+            <h3>Total Devices</h3>
+            <p id="totalDevices">0</p>
+            <small>Registered devices</small>
+        </div>
+
+        <div class="summary-card">
+            <div class="icon">⚡</div>
+            <h3>Active Devices</h3>
+            <p id="activeDevices">0</p>
+            <small>Currently switched on</small>
+        </div>
+
+        <div class="summary-card">
+            <div class="icon">🌡️</div>
+            <h3>Temperature</h3>
+            <p id="mainTemp">26°C</p>
+            <small>Living room sensor</small>
+        </div>
+
+        <div class="summary-card">
+            <div class="icon">💡</div>
+            <h3>Power Usage</h3>
+            <p id="mainPower">0 W</p>
+            <small>Estimated live consumption</small>
+        </div>
+
+    </section>
+
+    <!-- Room selection -->
+    <div class="section-heading">
+        <h2>My Rooms</h2>
+        <select id="roomFilter">
+            <option value="All">All Rooms</option>
+            <option value="Living Room">Living Room</option>
+            <option value="Bedroom">Bedroom</option>
+            <option value="Kitchen">Kitchen</option>
+        </select>
+    </div>
+
+    <div class="rooms">
+        <button class="room-btn active" data-room="All">🏠 All</button>
+        <button class="room-btn" data-room="Living Room">🛋️ Living Room</button>
+        <button class="room-btn" data-room="Bedroom">🛏️ Bedroom</button>
+        <button class="room-btn" data-room="Kitchen">🍳 Kitchen</button>
+    </div>
+
+    <!-- Devices -->
+    <div class="section-heading">
+        <h2>Connected Devices</h2>
+        <span id="deviceCount" style="color:var(--muted);font-size:13px">
+            0 devices
+        </span>
+    </div>
+
+    <section class="device-grid" id="deviceGrid"></section>
+
+    <!-- Environment -->
+    <div class="section-heading">
+        <h2>Environment Monitoring</h2>
+        <span style="color:var(--muted);font-size:12px">
+            Simulated sensor data
+        </span>
+    </div>
+
+    <section class="environment-grid">
+
+        <div class="environment-card">
+            <h3>🌡️ Room Temperature</h3>
+            <div class="environment-value" id="temperature">26°C</div>
+            <p>Current indoor temperature</p>
+        </div>
+
+        <div class="environment-card">
+            <h3>💧 Humidity</h3>
+            <div class="environment-value" id="humidity">55%</div>
+            <p>Current indoor humidity</p>
+        </div>
+
+    </section>
+
+    <!-- Energy -->
+    <div class="section-heading">
+        <h2>Energy Monitoring</h2>
+    </div>
+
+    <section class="energy-panel">
+        <div class="energy-header">
+            <h3>Estimated Power Consumption</h3>
+            <strong id="energyValue">0 W</strong>
+        </div>
+
+        <div class="progress-track">
+            <div class="progress-fill" id="energyBar"></div>
+        </div>
+
+        <div class="energy-details">
+            <span>0 W</span>
+            <span>Maximum display: 2000 W</span>
+        </div>
+
+        <div style="margin-top:20px;color:var(--muted);font-size:13px">
+            Estimated daily energy:
+            <strong id="dailyEnergy" style="color:var(--green)">0.00 kWh</strong>
+        </div>
+    </section>
+
+    <!-- Master controls -->
+    <div class="section-heading">
+        <h2>Quick Controls</h2>
+    </div>
+
+    <div class="actions">
+        <button class="action-btn on-btn" onclick="masterControl(true)">
+            Turn All ON
+        </button>
+
+        <button class="action-btn off-btn" onclick="masterControl(false)">
+            Turn All OFF
+        </button>
+
+        <button class="action-btn reset-btn" onclick="resetDevices()">
+            Reset Devices
+        </button>
+    </div>
+
+    <!-- Activity -->
+    <section class="activity">
+        <h3>Recent Activity</h3>
+        <div class="activity-list" id="activityList">
+            <p class="empty">No activity yet.</p>
+        </div>
+    </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+    SmartHome Automation Dashboard | HTML, CSS and JavaScript
+    <br><br>
+    Educational simulation – no physical appliances connected.
+</footer>
+
+<script>
+
+// Device data
+const initialDevices = [
+    {
+        id: 1,
+        name: "Living Room Light",
+        room: "Living Room",
+        type: "light",
+        icon: "💡",
+        power: 20,
+        on: true,
+        brightness: 80
+    },
+    {
+        id: 2,
+        name: "Living Room Fan",
+        room: "Living Room",
+        type: "fan",
+        icon: "🌀",
+        power: 75,
+        on: false,
+        speed: 2
+    },
+    {
+        id: 3,
+        name: "Living Room AC",
+        room: "Living Room",
+        type: "ac",
+        icon: "❄️",
+        power: 1200,
+        on: false,
+        temperature: 24,
+        mode: "Cool"
+    },
+    {
+        id: 4,
+        name: "Bedroom Light",
+        room: "Bedroom",
+        type: "light",
+        icon: "💡",
+        power: 15,
+        on: false,
+        brightness: 70
+    },
+    {
+        id: 5,
+        name: "Bedroom Fan",
+        room: "Bedroom",
+        type: "fan",
+        icon: "🌀",
+        power: 60,
+        on: true,
+        speed: 2
+    },
+    {
+        id: 6,
+        name: "Kitchen Light",
+        room: "Kitchen",
+        type: "light",
+        icon: "💡",
+        power: 18,
+        on: false,
+        brightness: 100
+    }
+];
+
+// Load saved devices
+function loadDevices() {
+    try {
+        const saved = JSON.parse(localStorage.getItem("smartHomeDevices"));
+
+        if (!Array.isArray(saved) || saved.length !== initialDevices.length) {
+            return structuredClone(initialDevices);
+        }
+
+        return saved;
+    } catch {
+        return structuredClone(initialDevices);
+    }
+}
+
+let devices = loadDevices();
+let activity = JSON.parse(localStorage.getItem("smartHomeActivity")) || [];
+let selectedRoom = "All";
+let temperature = 26;
+let humidity = 55;
+
+// Save device data
+function saveDevices() {
+    localStorage.setItem("smartHomeDevices", JSON.stringify(devices));
+    localStorage.setItem("smartHomeActivity", JSON.stringify(activity));
+}
+
+// Calculate power
+function calculatePower() {
+    return devices.reduce((total, device) => {
+
+        if (!device.on) return total;
+
+        if (device.type === "light") {
+            return total + device.power * (device.brightness / 100);
+        }
+
+        if (device.type === "fan") {
+            return total + device.power * (device.speed / 3);
+        }
+
+        return total + device.power;
+
+    }, 0);
+}
+
+// Display dashboard
+function updateDashboard() {
+
+    const active = devices.filter(device => device.on).length;
+    const power = Math.round(calculatePower());
+
+    document.getElementById("totalDevices").textContent =
+        devices.length;
+
+    document.getElementById("activeDevices").textContent =
+        active;
+
+    document.getElementById("mainTemp").textContent =
+        temperature + "°C";
+
+    document.getElementById("mainPower").textContent =
+        power + " W";
+
+    document.getElementById("energyValue").textContent =
+        power + " W";
+
+    document.getElementById("temperature").textContent =
+        temperature + "°C";
+
+    document.getElementById("humidity").textContent =
+        humidity + "%";
+
+    document.getElementById("energyBar").style.width =
+        Math.min(power / 2000 * 100, 100) + "%";
+
+    // Estimate daily consumption at the current power level
+    const daily = (power * 24 / 1000).toFixed(2);
+
+    document.getElementById("dailyEnergy").textContent =
+        daily + " kWh";
+}
+
+// Render devices
+function renderDevices() {
+
+    const grid = document.getElementById("deviceGrid");
+    grid.innerHTML = "";
+
+    const filtered = devices.filter(device =>
+        selectedRoom === "All" || device.room === selectedRoom
+    );
+
+    document.getElementById("deviceCount").textContent =
+        filtered.length + " devices";
+
+    filtered.forEach(device => {
+
+        const card = document.createElement("div");
+
+        card.className = "device" + (device.on ? " on" : "");
+
+        const top = document.createElement("div");
+        top.className = "device-top";
+
+        const icon = document.createElement("div");
+        icon.className = "device-icon";
+        icon.textContent = device.icon;
+
+        const status = document.createElement("span");
+        status.className = "status" + (device.on ? " on" : "");
+        status.textContent = device.on ? "ON" : "OFF";
+
+        top.append(icon, status);
+
+        const title = document.createElement("h3");
+        title.textContent = device.name;
+
+        const room = document.createElement("p");
+        room.className = "room-name";
+        room.textContent = device.room;
+
+        const bottom = document.createElement("div");
+        bottom.className = "device-bottom";
+
+        const power = document.createElement("span");
+        power.className = "device-power";
+        power.textContent = device.on
+            ? Math.round(getDevicePower(device)) + " W"
+            : "0 W";
+
+        const toggle = document.createElement("button");
+        toggle.className = "toggle" + (device.on ? " active" : "");
+        toggle.setAttribute("aria-label", "Toggle " + device.name);
+
+        toggle.addEventListener("click", () => {
+            toggleDevice(device.id);
+        });
+
+        bottom.append(power, toggle);
+
+        card.append(top, title, room, bottom);
+
+        // Add controls for individual devices
+        if (device.type === "light") {
+
+            const control = document.createElement("div");
+            control.className = "device-control";
+
+            const label = document.createElement("label");
+            label.textContent = "Brightness: " + device.brightness + "%";
+
+            const slider = document.createElement("input");
+            slider.type = "range";
+            slider.min = 0;
+            slider.max = 100;
+            slider.value = device.brightness;
+            slider.disabled = !device.on;
+
+            slider.addEventListener("input", () => {
+                device.brightness = Number(slider.value);
+                label.textContent = "Brightness: " + device.brightness + "%";
+                power.textContent = Math.round(getDevicePower(device)) + " W";
+                updateDashboard();
+                saveDevices();
+            });
+
+            control.append(label, slider);
+            card.appendChild(control);
+        }
+
+        if (device.type === "fan") {
+
+            const control = document.createElement("div");
+            control.className = "device-control";
+
+            const label = document.createElement("label");
+            label.textContent = "Fan Speed: " + device.speed;
+
+            const slider = document.createElement("input");
+            slider.type = "range";
+            slider.min = 1;
+            slider.max = 3;
+            slider.step = 1;
+            slider.value = device.speed;
+            slider.disabled = !device.on;
+
+            slider.addEventListener("input", () => {
+                device.speed = Number(slider.value);
+                label.textContent = "Fan Speed: " + device.speed;
+                power.textContent = Math.round(getDevicePower(device)) + " W";
+                updateDashboard();
+                saveDevices();
+            });
+
+            control.append(label, slider);
+            card.appendChild(control);
+        }
+
+        if (device.type === "ac") {
+
+            const control = document.createElement("div");
+            control.className = "device-control";
+
+            const label = document.createElement("label");
+            label.textContent =
+                "Temperature: " + device.temperature + "°C";
+
+            const slider = document.createElement("input");
+            slider.type = "range";
+            slider.min = 16;
+            slider.max = 30;
+            slider.value = device.temperature;
+            slider.disabled = !device.on;
+
+            slider.addEventListener("input", () => {
+                device.temperature = Number(slider.value);
+                label.textContent =
+                    "Temperature: " + device.temperature + "°C";
+                saveDevices();
+            });
+
+            const mode = document.createElement("select");
+            mode.style.width = "100%";
+            mode.style.marginTop = "12px";
+            mode.disabled = !device.on;
+
+            ["Cool", "Dry", "Fan"].forEach(option => {
+                const item = document.createElement("option");
+                item.value = option;
+                item.textContent = option + " Mode";
+                mode.appendChild(item);
+            });
+
+            mode.value = device.mode;
+
+            mode.addEventListener("change", () => {
+                device.mode = mode.value;
+                saveDevices();
+                showToast("AC mode changed to " + mode.value);
+            });
+
+            control.append(label, slider, mode);
+            card.appendChild(control);
+        }
+
+        grid.appendChild(card);
+    });
+
+    updateDashboard();
+}
+
+// Calculate individual device power
+function getDevicePower(device) {
+
+    if (!device.on) return 0;
+
+    if (device.type === "light") {
+        return device.power * device.brightness / 100;
+    }
+
+    if (device.type === "fan") {
+        return device.power * device.speed / 3;
+    }
+
+    return device.power;
+}
+
+// Toggle one device
+function toggleDevice(id) {
+
+    const device = devices.find(item => item.id === id);
+
+    if (!device) return;
+
+    device.on = !device.on;
+
+    addActivity(
+        device.name + " turned " + (device.on ? "ON" : "OFF")
+    );
+
+    saveDevices();
+    renderDevices();
+
+    showToast(device.name + " is " + (device.on ? "ON" : "OFF"));
+}
+
+// Master control
+function masterControl(state) {
+
+    devices.forEach(device => {
+        device.on = state;
+    });
+
+    addActivity("All devices turned " + (state ? "ON" : "OFF"));
+
+    saveDevices();
+    renderDevices();
+
+    showToast("All devices turned " + (state ? "ON" : "OFF"));
+}
+
+// Reset to original device settings
+function resetDevices() {
+
+    if (!confirm("Reset all devices to their original settings?")) {
+        return;
+    }
+
+    devices = structuredClone(initialDevices);
+
+    addActivity("Device settings reset");
+
+    saveDevices();
+    renderDevices();
+
+    showToast("Devices reset successfully");
+}
+
+// Room selection
+document.querySelectorAll(".room-btn").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        document.querySelectorAll(".room-btn").forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        selectedRoom = button.dataset.room;
+
+        document.getElementById("roomFilter").value = selectedRoom;
+
+        renderDevices();
+    });
+
+});
+
+// Dropdown room selection
+document.getElementById("roomFilter").addEventListener("change", function() {
+
+    selectedRoom = this.value;
+
+    document.querySelectorAll(".room-btn").forEach(button => {
+        button.classList.toggle(
+            "active",
+            button.dataset.room === selectedRoom
+        );
+    });
+
+    renderDevices();
+});
+
+// Activity history
+function addActivity(message) {
+
+    const time = new Date().toLocaleTimeString();
+
+    activity.unshift({
+        message: message,
+        time: time
+    });
+
+    activity = activity.slice(0, 8);
+
+    renderActivity();
+}
+
+// Render activity history safely
+function renderActivity() {
+
+    const list = document.getElementById("activityList");
+    list.innerHTML = "";
+
+    if (!activity.length) {
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent = "No activity yet.";
+        list.appendChild(empty);
+        return;
+    }
+
+    activity.forEach(item => {
+
+        const row = document.createElement("div");
+        row.className = "activity-item";
+
+        const message = document.createElement("span");
+        message.textContent = "● " + item.message;
+
+        const time = document.createElement("span");
+        time.textContent = item.time;
+
+        row.append(message, time);
+        list.appendChild(row);
+    });
+}
+
+// Toast notification
+function showToast(message) {
+
+    const toast = document.getElementById("toast");
+
+    toast.textContent = message;
+    toast.style.display = "block";
+
+    clearTimeout(window.toastTimer);
+
+    window.toastTimer = setTimeout(() => {
+        toast.style.display = "none";
+    }, 2200);
+}
+
+// Live clock
+function updateClock() {
+    document.getElementById("clock").textContent =
+        new Date().toLocaleTimeString();
+}
+
+// Simulated environment readings
+function updateEnvironment() {
+
+    temperature = Math.max(
+        20,
+        Math.min(32, temperature + (Math.random() - 0.5))
+    );
+
+    humidity = Math.max(
+        35,
+        Math.min(75, humidity + (Math.random() - 0.5) * 2)
+    );
+
+    temperature = Math.round(temperature * 10) / 10;
+    humidity = Math.round(humidity);
+
+    updateDashboard();
+}
+
+// Initial loading
+renderDevices();
+renderActivity();
+updateClock();
+
+setInterval(updateClock, 1000);
+setInterval(updateEnvironment, 5000);
+
+</script>
+
+</body>
+</html>
