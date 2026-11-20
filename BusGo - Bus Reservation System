@@ -1,0 +1,515 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BusGo - Bus Reservation System</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f3f5fa;color:#20263a}
+header{background:#18233f;color:white;padding:20px 7%;display:flex;
+justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.logo{font-size:25px;font-weight:bold;color:#65e0c2}
+nav a{color:white;text-decoration:none;margin-left:20px;font-size:14px}
+.hero{background:linear-gradient(120deg,#18233f,#344d7b);color:white;
+padding:45px 7% 65px}
+.hero h1{font-size:34px;margin-bottom:10px}
+.hero p{color:#d5dced;margin-bottom:25px}
+.search{background:white;padding:20px;border-radius:12px;display:grid;
+grid-template-columns:repeat(4,1fr) auto;gap:12px;max-width:1100px}
+.field label{display:block;color:#687087;font-size:12px;margin-bottom:7px}
+input,select{width:100%;padding:12px;border:1px solid #dce1eb;
+border-radius:7px;font-size:14px;background:white}
+button{border:0;border-radius:7px;padding:12px 17px;cursor:pointer;
+font-weight:bold;background:#16a887;color:white}
+button:hover{opacity:.88}
+.search button{align-self:end}
+.container{max-width:1100px;margin:30px auto;padding:0 18px}
+.section-title{display:flex;justify-content:space-between;align-items:center;
+margin-bottom:18px;gap:10px;flex-wrap:wrap}
+.muted{color:#778096;font-size:13px}
+.bus-list{display:grid;gap:15px}
+.bus-card{background:white;border:1px solid #e6e9f0;border-radius:12px;
+padding:19px;display:grid;grid-template-columns:1.4fr 1fr 1fr auto;
+gap:15px;align-items:center}
+.bus-card h3{font-size:17px;margin-bottom:7px}
+.bus-card small{color:#788197}
+.time{font-size:20px;font-weight:bold}
+.price{font-size:21px;font-weight:bold;color:#18233f}
+.tag{display:inline-block;background:#e7f8f3;color:#13876e;
+padding:5px 8px;border-radius:5px;font-size:11px;margin-top:7px}
+.empty{background:white;padding:35px;text-align:center;border-radius:10px;
+color:#778096}
+.panel{background:white;padding:22px;border-radius:12px;
+border:1px solid #e6e9f0;margin-top:20px}
+.hidden{display:none!important}
+.panel h2{margin-bottom:8px}
+.seat-layout{display:grid;grid-template-columns:repeat(4,48px);
+gap:12px;justify-content:center;margin:25px auto}
+.seat{height:42px;border:1px solid #b8c4d3;background:#f4f7fa;
+color:#34415c;border-radius:8px;padding:0}
+.seat.selected{background:#16a887;color:white;border-color:#16a887}
+.seat.booked{background:#d9dee7;color:#9aa2b1;cursor:not-allowed}
+.seat.driver{background:#e8edf5;color:#63718a;cursor:default}
+.legend{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;
+font-size:12px;color:#687087}
+.legend span{display:flex;align-items:center;gap:6px}
+.dot{width:13px;height:13px;border-radius:4px;background:#f4f7fa;
+border:1px solid #b8c4d3}
+.dot.green{background:#16a887}
+.dot.grey{background:#d9dee7}
+.booking-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;
+margin-top:18px}
+.booking-grid .full{grid-column:1/-1}
+.summary{background:#f3f7fb;border-radius:9px;padding:15px;
+margin-top:15px;line-height:1.8}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+.secondary{background:#e8edf5;color:#26334d}
+.danger{background:#e65b65;color:white}
+.history-card{background:white;border:1px solid #e6e9f0;
+border-radius:10px;padding:17px;margin-bottom:12px}
+.ticket{border:2px dashed #16a887;background:#f5fffc;
+padding:22px;border-radius:12px;margin-top:18px;line-height:1.9}
+.ticket h2{color:#13876e}
+footer{text-align:center;padding:30px;color:#7b8497;font-size:13px}
+@media(max-width:800px){
+.search{grid-template-columns:1fr 1fr}
+.search button{grid-column:1/-1}
+.bus-card{grid-template-columns:1fr 1fr}
+}
+@media(max-width:520px){
+.hero h1{font-size:27px}
+.search,.booking-grid{grid-template-columns:1fr}
+.booking-grid .full{grid-column:auto}
+.bus-card{grid-template-columns:1fr 1fr}
+.seat-layout{grid-template-columns:repeat(4,43px)}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🚌 BusGo</div>
+  <nav>
+    <a href="#search">Search</a>
+    <a href="#results">Buses</a>
+    <a href="#history">My Bookings</a>
+  </nav>
+</header>
+
+<section class="hero" id="search">
+  <h1>Travel Made Simple.</h1>
+  <p>Find your bus, choose your seat, and book your journey.</p>
+
+  <form class="search" id="searchForm">
+    <div class="field">
+      <label>FROM</label>
+      <select id="from" required>
+        <option value="Hyderabad">Hyderabad</option>
+        <option value="Bengaluru">Bengaluru</option>
+        <option value="Chennai">Chennai</option>
+        <option value="Vijayawada">Vijayawada</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>TO</label>
+      <select id="to" required>
+        <option value="Bengaluru">Bengaluru</option>
+        <option value="Hyderabad">Hyderabad</option>
+        <option value="Chennai">Chennai</option>
+        <option value="Vijayawada">Vijayawada</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>TRAVEL DATE</label>
+      <input type="date" id="travelDate" required>
+    </div>
+    <button type="submit">Search Buses</button>
+  </form>
+</section>
+
+<main class="container">
+  <section id="results">
+    <div class="section-title">
+      <div>
+        <h2>Available Buses</h2>
+        <p class="muted" id="resultInfo">Search to see available buses.</p>
+      </div>
+    </div>
+    <div class="bus-list" id="busList">
+      <div class="empty">Enter your journey details to find buses.</div>
+    </div>
+  </section>
+
+  <section class="panel hidden" id="seatPanel">
+    <h2>Select Your Seats</h2>
+    <p class="muted" id="selectedBusInfo"></p>
+    <div class="legend">
+      <span><i class="dot"></i> Available</span>
+      <span><i class="dot green"></i> Selected</span>
+      <span><i class="dot grey"></i> Booked</span>
+    </div>
+    <div class="seat-layout" id="seatLayout"></div>
+    <p class="muted" style="text-align:center" id="seatInfo">
+      Select one or more seats.
+    </p>
+
+    <div class="booking-grid">
+      <div class="field">
+        <label>PASSENGER NAME</label>
+        <input id="passengerName" placeholder="Enter full name">
+      </div>
+      <div class="field">
+        <label>PHONE NUMBER</label>
+        <input id="phone" type="tel" maxlength="10"
+          placeholder="10-digit mobile number">
+      </div>
+      <div class="field full">
+        <label>EMAIL ADDRESS</label>
+        <input id="email" type="email" placeholder="Enter email address">
+      </div>
+    </div>
+
+    <div class="summary" id="fareSummary">
+      Select seats to calculate your fare.
+    </div>
+    <div class="actions">
+      <button id="confirmBtn" type="button">Confirm Booking</button>
+      <button class="secondary" id="closeSeatBtn" type="button">Close</button>
+    </div>
+  </section>
+
+  <section class="panel hidden" id="confirmation">
+    <h2>Booking Confirmation</h2>
+    <div id="ticketDetails"></div>
+    <div class="actions">
+      <button onclick="window.print()">Print Ticket</button>
+      <button class="secondary" id="newSearchBtn">New Search</button>
+    </div>
+  </section>
+
+  <section id="history" style="margin-top:35px">
+    <div class="section-title">
+      <h2>My Bookings</h2>
+      <span class="muted">Saved on this browser</span>
+    </div>
+    <div id="historyList"></div>
+  </section>
+</main>
+
+<footer>BusGo Reservation System | Student Project Demo</footer>
+
+<script>
+const buses = [
+  {id:1,name:"Express Travels",type:"AC Sleeper",from:"Hyderabad",
+   to:"Bengaluru",departure:"21:00",arrival:"07:00",price:1200,
+   rating:4.5,duration:"10 hours"},
+  {id:2,name:"City Line Travels",type:"Non-AC Seater",from:"Hyderabad",
+   to:"Bengaluru",departure:"20:30",arrival:"06:30",price:750,
+   rating:4.2,duration:"10 hours"},
+  {id:3,name:"Royal Roadways",type:"AC Seater",from:"Hyderabad",
+   to:"Bengaluru",departure:"22:00",arrival:"08:00",price:950,
+   rating:4.7,duration:"10 hours"},
+  {id:4,name:"Green Bus Service",type:"AC Sleeper",from:"Hyderabad",
+   to:"Chennai",departure:"19:00",arrival:"07:00",price:1400,
+   rating:4.4,duration:"12 hours"},
+  {id:5,name:"South Star Travels",type:"AC Seater",from:"Bengaluru",
+   to:"Chennai",departure:"21:30",arrival:"05:30",price:850,
+   rating:4.3,duration:"8 hours"},
+  {id:6,name:"Deccan Express",type:"Non-AC Seater",from:"Hyderabad",
+   to:"Vijayawada",departure:"08:00",arrival:"12:30",price:500,
+   rating:4.1,duration:"4.5 hours"},
+  {id:7,name:"Morning Express",type:"AC Seater",from:"Vijayawada",
+   to:"Hyderabad",departure:"09:00",arrival:"13:30",price:650,
+   rating:4.6,duration:"4.5 hours"}
+];
+
+const $ = id => document.getElementById(id);
+let currentBus = null;
+let selectedSeats = [];
+let currentDate = "";
+
+let bookings = JSON.parse(localStorage.getItem("busgoBookings") || "[]");
+
+const today = new Date();
+const localDate = new Date(today.getTime() - today.getTimezoneOffset()*60000)
+  .toISOString().split("T")[0];
+$("travelDate").min = localDate;
+$("travelDate").value = localDate;
+
+function saveBookings(){
+  localStorage.setItem("busgoBookings", JSON.stringify(bookings));
+}
+
+function searchBuses(event){
+  event.preventDefault();
+  const from = $("from").value;
+  const to = $("to").value;
+  currentDate = $("travelDate").value;
+
+  if(from === to){
+    alert("Source and destination cannot be the same.");
+    return;
+  }
+
+  if(!currentDate || currentDate < localDate){
+    alert("Please select a valid travel date.");
+    return;
+  }
+
+  $("seatPanel").classList.add("hidden");
+  $("confirmation").classList.add("hidden");
+
+  const results = buses.filter(bus => bus.from === from && bus.to === to);
+  $("resultInfo").textContent =
+    `${from} → ${to} | ${currentDate} | ${results.length} buses found`;
+
+  if(results.length === 0){
+    $("busList").innerHTML =
+      '<div class="empty">No demo buses available for this route. Try another route.</div>';
+    return;
+  }
+
+  $("busList").innerHTML = results.map(bus => `
+    <article class="bus-card">
+      <div>
+        <h3>${bus.name}</h3>
+        <small>${bus.type}</small><br>
+        <span class="tag">★ ${bus.rating} rating</span>
+      </div>
+      <div>
+        <div class="time">${bus.departure}</div>
+        <small>${bus.from}</small>
+      </div>
+      <div>
+        <div class="time">${bus.arrival}</div>
+        <small>${bus.to}</small><br>
+        <small>${bus.duration}</small>
+      </div>
+      <div>
+        <div class="price">₹${bus.price}</div>
+        <small>per seat</small><br><br>
+        <button onclick="chooseBus(${bus.id})">Select Seats</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+$("searchForm").addEventListener("submit", searchBuses);
+
+function getBookedSeats(busId){
+  return bookings
+    .filter(b => b.busId === busId && b.date === currentDate &&
+      b.status === "Confirmed")
+    .flatMap(b => b.seats);
+}
+
+function chooseBus(id){
+  currentBus = buses.find(bus => bus.id === id);
+  selectedSeats = [];
+  $("passengerName").value = "";
+  $("phone").value = "";
+  $("email").value = "";
+
+  $("selectedBusInfo").textContent =
+    `${currentBus.name} | ${currentBus.from} → ${currentBus.to} | ₹${currentBus.price} per seat`;
+
+  renderSeats();
+  updateFare();
+  $("seatPanel").classList.remove("hidden");
+  $("confirmation").classList.add("hidden");
+  $("seatPanel").scrollIntoView({behavior:"smooth"});
+}
+
+function renderSeats(){
+  const booked = getBookedSeats(currentBus.id);
+  const letters = ["A","B","C","D"];
+  let html = '<button class="seat driver" disabled>DR</button>';
+
+  for(let i=1;i<=3;i++){
+    html += `<button class="seat driver" disabled>${i}</button>`;
+  }
+
+  for(let row=1;row<=5;row++){
+    for(let col=0;col<4;col++){
+      const seat = letters[col] + row;
+      const isBooked = booked.includes(seat);
+      const isSelected = selectedSeats.includes(seat);
+      html += `<button class="seat ${isBooked?"booked":""} ${isSelected?"selected":""}"
+        ${isBooked?"disabled":""}
+        onclick="toggleSeat('${seat}')">${seat}</button>`;
+    }
+  }
+  $("seatLayout").innerHTML = html;
+}
+
+function toggleSeat(seat){
+  if(selectedSeats.includes(seat)){
+    selectedSeats = selectedSeats.filter(s => s !== seat);
+  }else{
+    if(selectedSeats.length >= 6){
+      alert("You can select a maximum of 6 seats per booking.");
+      return;
+    }
+    selectedSeats.push(seat);
+  }
+  renderSeats();
+  updateFare();
+}
+
+function updateFare(){
+  const total = selectedSeats.length * (currentBus ? currentBus.price : 0);
+  $("seatInfo").textContent = selectedSeats.length
+    ? "Selected seats: " + selectedSeats.join(", ")
+    : "Select one or more seats.";
+
+  $("fareSummary").innerHTML = `
+    Seats selected: <strong>${selectedSeats.length}</strong><br>
+    Price per seat: <strong>₹${currentBus ? currentBus.price : 0}</strong><br>
+    Total fare: <strong>₹${total}</strong>
+  `;
+}
+
+$("confirmBtn").addEventListener("click", confirmBooking);
+
+function confirmBooking(){
+  const name = $("passengerName").value.trim();
+  const phone = $("phone").value.trim();
+  const email = $("email").value.trim();
+
+  if(selectedSeats.length === 0){
+    alert("Please select at least one seat.");
+    return;
+  }
+  if(name.length < 2){
+    alert("Please enter a valid passenger name.");
+    return;
+  }
+  if(!/^[6-9]\d{9}$/.test(phone)){
+    alert("Please enter a valid 10-digit Indian mobile number.");
+    return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    alert("Please enter a valid email address.");
+    return;
+  }
+
+  // Check seats again before saving the booking.
+  const bookedNow = getBookedSeats(currentBus.id);
+  if(selectedSeats.some(seat => bookedNow.includes(seat))){
+    alert("One of your selected seats is no longer available. Please select again.");
+    selectedSeats = selectedSeats.filter(seat => !bookedNow.includes(seat));
+    renderSeats();
+    updateFare();
+    return;
+  }
+
+  const booking = {
+    reference:"BG" + Date.now().toString().slice(-8),
+    busId:currentBus.id,
+    busName:currentBus.name,
+    type:currentBus.type,
+    from:currentBus.from,
+    to:currentBus.to,
+    departure:currentBus.departure,
+    arrival:currentBus.arrival,
+    date:currentDate,
+    seats:[...selectedSeats],
+    passenger:name,
+    phone:phone,
+    email:email,
+    total:selectedSeats.length * currentBus.price,
+    status:"Confirmed"
+  };
+
+  bookings.unshift(booking);
+  saveBookings();
+  showTicket(booking);
+  renderHistory();
+  $("seatPanel").classList.add("hidden");
+  $("confirmation").classList.remove("hidden");
+  $("confirmation").scrollIntoView({behavior:"smooth"});
+}
+
+function showTicket(b){
+  $("ticketDetails").innerHTML = `
+    <div class="ticket">
+      <h2>🚌 BusGo E-Ticket</h2>
+      <p><strong>Booking ID:</strong> ${b.reference}</p>
+      <p><strong>Passenger:</strong> ${escapeHTML(b.passenger)}</p>
+      <p><strong>Route:</strong> ${b.from} → ${b.to}</p>
+      <p><strong>Bus:</strong> ${b.busName} (${b.type})</p>
+      <p><strong>Date:</strong> ${b.date}</p>
+      <p><strong>Departure:</strong> ${b.departure} | <strong>Arrival:</strong> ${b.arrival}</p>
+      <p><strong>Seats:</strong> ${b.seats.join(", ")}</p>
+      <p><strong>Phone:</strong> ${b.phone}</p>
+      <hr>
+      <h3>Total Paid: ₹${b.total}</h3>
+      <p><strong>Status:</strong> ${b.status}</p>
+      <p class="muted">Demo confirmation only. No actual payment was collected.</p>
+    </div>
+  `;
+}
+
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[char]));
+}
+
+function renderHistory(){
+  if(bookings.length === 0){
+    $("historyList").innerHTML =
+      '<div class="empty">You have no bookings yet.</div>';
+    return;
+  }
+
+  $("historyList").innerHTML = bookings.map((b,index) => `
+    <div class="history-card">
+      <div class="section-title">
+        <strong>${b.from} → ${b.to}</strong>
+        <span class="tag">${b.status}</span>
+      </div>
+      <p class="muted">${b.busName} | ${b.date}</p>
+      <p>Passenger: ${escapeHTML(b.passenger)}</p>
+      <p>Seats: ${b.seats.join(", ")} | Total: ₹${b.total}</p>
+      <p class="muted">Booking ID: ${b.reference}</p>
+      <div class="actions">
+        <button class="secondary" onclick="viewBooking(${index})">View Ticket</button>
+        ${b.status === "Confirmed"
+          ? `<button class="danger" onclick="cancelBooking(${index})">Cancel Booking</button>`
+          : ""}
+      </div>
+    </div>
+  `).join("");
+}
+
+function viewBooking(index){
+  showTicket(bookings[index]);
+  $("confirmation").classList.remove("hidden");
+  $("confirmation").scrollIntoView({behavior:"smooth"});
+}
+
+function cancelBooking(index){
+  if(!confirm("Are you sure you want to cancel this booking?")) return;
+  bookings[index].status = "Cancelled";
+  saveBookings();
+  renderHistory();
+  if(currentBus) renderSeats();
+  alert("Demo booking cancelled.");
+}
+
+$("closeSeatBtn").addEventListener("click",()=>{
+  $("seatPanel").classList.add("hidden");
+});
+
+$("newSearchBtn").addEventListener("click",()=>{
+  $("confirmation").classList.add("hidden");
+  $("search").scrollIntoView({behavior:"smooth"});
+});
+
+renderHistory();
+</script>
+</body>
+</html>
