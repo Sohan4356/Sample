@@ -1,0 +1,425 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BidZone - Online Auction</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f4f6fb;color:#20283b}
+header{background:#182541;color:white;padding:20px 7%;display:flex;
+justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.logo{font-size:25px;font-weight:bold;color:#68e0c0}
+nav a{color:white;text-decoration:none;margin-left:18px;font-size:14px}
+.hero{background:linear-gradient(120deg,#182541,#405d8a);color:white;
+padding:45px 7%}
+.hero h1{font-size:34px;margin-bottom:10px}
+.hero p{color:#dce5f2;line-height:1.5}
+.container{max-width:1150px;margin:30px auto;padding:0 18px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.stat{background:white;border:1px solid #e5e9f1;border-radius:11px;padding:20px}
+.stat p{color:#7b8498;font-size:13px}
+.stat h2{font-size:27px;margin-top:9px}
+.panel{background:white;border:1px solid #e5e9f1;border-radius:12px;
+padding:22px;margin-top:25px}
+.panel h2{margin-bottom:7px}
+.muted{color:#7b8498;font-size:13px}
+button{border:0;border-radius:7px;padding:11px 15px;cursor:pointer;
+font-weight:bold;background:#12a886;color:white}
+button:hover{opacity:.87}
+.secondary{background:#e9edf5;color:#283650}
+.danger{background:#e35c68;color:white}
+input,select,textarea{width:100%;padding:12px;border:1px solid #dce1eb;
+border-radius:7px;font-size:14px;background:white;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#12a886}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-top:18px}
+.auction-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:17px;margin-top:22px}
+.auction-card{background:white;border:1px solid #e5e9f1;border-radius:12px;
+padding:19px;display:flex;flex-direction:column;gap:10px}
+.auction-card h3{font-size:18px}
+.auction-card p{font-size:13px;color:#778197;line-height:1.5}
+.item-emoji{font-size:32px;background:#eef4fb;width:58px;height:58px;
+display:grid;place-items:center;border-radius:12px}
+.price{font-size:24px;font-weight:bold;color:#182541}
+.tag{display:inline-block;border-radius:5px;padding:5px 8px;font-size:11px;
+font-weight:bold;background:#e8f8f2;color:#13876d}
+.ended{background:#edf0f5;color:#69758a}
+.card-bottom{margin-top:auto;padding-top:8px}
+.bid-form{display:flex;gap:8px;margin-top:10px}
+.bid-form input{min-width:0}
+.bid-form button{white-space:nowrap}
+.empty{background:white;text-align:center;padding:35px;border-radius:10px;
+color:#7b8498;margin-top:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:18px}
+.field label{display:block;font-size:13px;font-weight:bold;margin-bottom:7px}
+.full{grid-column:1/-1}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+.history-item{padding:13px 0;border-bottom:1px solid #edf0f5;line-height:1.6}
+.history-item:last-child{border-bottom:0}
+.modal{position:fixed;inset:0;background:#10192dcc;display:flex;
+align-items:center;justify-content:center;padding:15px;z-index:5}
+.modal-box{width:100%;max-width:550px;max-height:90vh;overflow:auto;
+background:white;border-radius:13px;padding:24px}
+.hidden{display:none!important}
+footer{text-align:center;padding:30px;color:#7b8498;font-size:13px}
+@media(max-width:850px){.auction-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){
+.hero h1{font-size:27px}
+.stats{grid-template-columns:1fr}
+.filters,.form-grid{grid-template-columns:1fr}
+.full{grid-column:auto}
+.auction-grid{grid-template-columns:1fr}
+.bid-form{flex-direction:column}
+nav a{margin-left:8px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🔨 BidZone</div>
+  <nav>
+    <a href="#auctions">Auctions</a>
+    <a href="#create">Create Auction</a>
+    <a href="#mybids">My Bids</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Discover. Bid. Win.</h1>
+  <p>Explore items, place your bids, and see who wins when the auction ends.</p>
+</section>
+
+<main class="container">
+  <section class="stats">
+    <div class="stat"><p>Total Auctions</p><h2 id="totalCount">0</h2></div>
+    <div class="stat"><p>Live Auctions</p><h2 id="liveCount">0</h2></div>
+    <div class="stat"><p>Ended Auctions</p><h2 id="endedCount">0</h2></div>
+  </section>
+
+  <section class="panel" id="create">
+    <h2>Create an Auction</h2>
+    <p class="muted">List an item for others to bid on.</p>
+    <form id="createForm" class="form-grid">
+      <div class="field">
+        <label>Item Name</label>
+        <input id="itemName" required maxlength="70" placeholder="Example: Wireless Headphones">
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="itemCategory" required>
+          <option value="">Choose category</option>
+          <option>Electronics</option>
+          <option>Fashion</option>
+          <option>Collectibles</option>
+          <option>Home</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Starting Price (₹)</label>
+        <input id="startingPrice" type="number" min="1" step="1" required>
+      </div>
+      <div class="field">
+        <label>Auction Duration</label>
+        <select id="duration" required>
+          <option value="1">1 minute (demo)</option>
+          <option value="60">1 hour</option>
+          <option value="1440" selected>1 day</option>
+          <option value="10080">7 days</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label>Description</label>
+        <textarea id="itemDescription" rows="3" maxlength="500" required
+          placeholder="Describe the item and its condition"></textarea>
+      </div>
+      <div class="full">
+        <button type="submit">Publish Auction</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel" id="auctions">
+    <h2>Browse Auctions</h2>
+    <p class="muted">Search listings and place your bid.</p>
+    <div class="filters">
+      <input id="searchInput" placeholder="Search item or description...">
+      <select id="categoryFilter">
+        <option value="All">All Categories</option>
+        <option>Electronics</option><option>Fashion</option>
+        <option>Collectibles</option><option>Home</option><option>Other</option>
+      </select>
+      <select id="statusFilter">
+        <option value="All">All Auctions</option>
+        <option value="Live">Live</option>
+        <option value="Ended">Ended</option>
+      </select>
+    </div>
+    <div class="auction-grid" id="auctionGrid"></div>
+  </section>
+
+  <section class="panel" id="mybids">
+    <h2>My Bid Activity</h2>
+    <p class="muted">Enter the same bidder name when bidding to see your activity.</p>
+    <div id="bidActivity"></div>
+  </section>
+</main>
+
+<div class="modal hidden" id="detailsModal">
+  <div class="modal-box">
+    <h2>Auction Details</h2>
+    <div id="detailsContent"></div>
+    <div class="actions">
+      <button class="secondary" onclick="closeDetails()">Close</button>
+    </div>
+  </div>
+</div>
+
+<footer>BidZone Online Auction | Front-end student project</footer>
+
+<script>
+const sampleAuctions = [
+  {
+    id:101,name:"Wireless Headphones",category:"Electronics",
+    description:"Bluetooth headphones in good condition.",
+    startPrice:1200,currentBid:1500,createdAt:Date.now(),
+    endAt:Date.now()+1000*60*60*5,
+    bids:[{name:"Aarav",amount:1500,time:Date.now()}]
+  },
+  {
+    id:102,name:"Vintage Wristwatch",category:"Collectibles",
+    description:"Classic-style wristwatch, gently used.",
+    startPrice:2000,currentBid:2000,createdAt:Date.now(),
+    endAt:Date.now()+1000*60*60*24,
+    bids:[]
+  },
+  {
+    id:103,name:"Travel Backpack",category:"Fashion",
+    description:"Large backpack suitable for travel and college.",
+    startPrice:800,currentBid:950,createdAt:Date.now(),
+    endAt:Date.now()+1000*60*60*2,
+    bids:[{name:"Maya",amount:950,time:Date.now()}]
+  }
+];
+
+let auctions;
+try {
+  const saved = localStorage.getItem("bidzoneAuctions");
+  auctions = saved ? JSON.parse(saved) : sampleAuctions;
+  if (!Array.isArray(auctions)) auctions = sampleAuctions;
+} catch {
+  auctions = sampleAuctions;
+}
+
+const $ = id => document.getElementById(id);
+
+function saveAuctions(){
+  localStorage.setItem("bidzoneAuctions",JSON.stringify(auctions));
+}
+
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function isLive(auction){
+  return Date.now() < auction.endAt;
+}
+
+function formatTime(ms){
+  if(ms<=0) return "Ended";
+  const total=Math.floor(ms/1000);
+  const days=Math.floor(total/86400);
+  const hours=Math.floor((total%86400)/3600);
+  const minutes=Math.floor((total%3600)/60);
+  const seconds=total%60;
+  return `${days?days+"d ":""}${hours}h ${minutes}m ${seconds}s`;
+}
+
+function updateStats(){
+  $("totalCount").textContent=auctions.length;
+  $("liveCount").textContent=auctions.filter(isLive).length;
+  $("endedCount").textContent=auctions.filter(a=>!isLive(a)).length;
+}
+
+function renderAuctions(){
+  const search=$("searchInput").value.toLowerCase().trim();
+  const category=$("categoryFilter").value;
+  const status=$("statusFilter").value;
+
+  const filtered=auctions.filter(a=>{
+    const text=(a.name+" "+a.description).toLowerCase();
+    return text.includes(search) &&
+      (category==="All"||a.category===category) &&
+      (status==="All"||(status==="Live"&&isLive(a))||
+        (status==="Ended"&&!isLive(a)));
+  });
+
+  if(!filtered.length){
+    $("auctionGrid").innerHTML='<div class="empty" style="grid-column:1/-1">No auctions match your search.</div>';
+    return;
+  }
+
+  $("auctionGrid").innerHTML=filtered.map(a=>`
+    <article class="auction-card">
+      <div class="item-emoji">${categoryIcon(a.category)}</div>
+      <span class="tag ${isLive(a)?"":"ended"}">${isLive(a)?"LIVE AUCTION":"AUCTION ENDED"}</span>
+      <h3>${escapeHTML(a.name)}</h3>
+      <p>${escapeHTML(a.category)} · ${escapeHTML(a.description)}</p>
+      <div>
+        <p>Current highest bid</p>
+        <div class="price">₹${a.currentBid}</div>
+        <p>${a.bids.length} bid(s)</p>
+      </div>
+      <p class="muted" data-countdown="${a.id}">${formatTime(a.endAt-Date.now())} remaining</p>
+      ${isLive(a)?`
+        <div class="bid-form">
+          <input type="text" id="bidder-${a.id}" maxlength="40" placeholder="Your bidder name">
+          <input type="number" id="amount-${a.id}" min="${a.currentBid+1}" step="1" placeholder="Bid ₹">
+          <button onclick="placeBid(${a.id})">Bid</button>
+        </div>
+      `:`<p><strong>Winner:</strong> ${a.bids.length?escapeHTML(a.bids[a.bids.length-1].name):"No bids"}</p>`}
+      <div class="card-bottom">
+        <button class="secondary" onclick="viewDetails(${a.id})">View Details & Bids</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+function categoryIcon(category){
+  return ({
+    Electronics:"🎧",Fashion:"👜",Collectibles:"⌚",Home:"🏠",Other:"📦"
+  })[category]||"📦";
+}
+
+function placeBid(id){
+  const auction=auctions.find(a=>a.id===id);
+  if(!auction||!isLive(auction)){
+    alert("This auction has ended.");
+    refresh();
+    return;
+  }
+
+  const name=$("bidder-"+id).value.trim();
+  const amount=Number($("amount-"+id).value);
+
+  if(name.length<2){
+    alert("Enter a bidder name with at least 2 characters.");
+    return;
+  }
+  if(!Number.isFinite(amount)||amount<=auction.currentBid){
+    alert("Your bid must be higher than ₹"+auction.currentBid+".");
+    return;
+  }
+
+  auction.currentBid=amount;
+  auction.bids.push({name,amount,time:Date.now()});
+  saveAuctions();
+  refresh();
+  alert("Your bid was placed successfully!");
+}
+
+$("createForm").addEventListener("submit",e=>{
+  e.preventDefault();
+
+  const name=$("itemName").value.trim();
+  const category=$("itemCategory").value;
+  const price=Number($("startingPrice").value);
+  const duration=Number($("duration").value);
+  const description=$("itemDescription").value.trim();
+
+  if(!name||!category||!description||!Number.isFinite(price)||price<=0){
+    alert("Please enter valid auction details.");
+    return;
+  }
+
+  const now=Date.now();
+  auctions.unshift({
+    id:now,name,category,description,
+    startPrice:price,currentBid:price,
+    createdAt:now,endAt:now+duration*60*1000,bids:[]
+  });
+
+  saveAuctions();
+  $("createForm").reset();
+  refresh();
+  $("auctions").scrollIntoView({behavior:"smooth"});
+  alert("Auction published!");
+});
+
+function viewDetails(id){
+  const a=auctions.find(x=>x.id===id);
+  if(!a)return;
+
+  const bidHistory=a.bids.length
+    ?a.bids.slice().reverse().map(b=>`
+      <div class="history-item">
+        <strong>${escapeHTML(b.name)}</strong> bid ₹${b.amount}
+        <div class="muted">${new Date(b.time).toLocaleString()}</div>
+      </div>`).join("")
+    :'<p class="muted">No bids have been placed yet.</p>';
+
+  $("detailsContent").innerHTML=`
+    <p><strong>Item:</strong> ${escapeHTML(a.name)}</p>
+    <p><strong>Category:</strong> ${escapeHTML(a.category)}</p>
+    <p><strong>Description:</strong> ${escapeHTML(a.description)}</p>
+    <p><strong>Starting price:</strong> ₹${a.startPrice}</p>
+    <p><strong>Current bid:</strong> ₹${a.currentBid}</p>
+    <p><strong>Status:</strong> ${isLive(a)?"Live":"Ended"}</p>
+    <h3 style="margin-top:18px">Bid History</h3>
+    ${bidHistory}
+  `;
+  $("detailsModal").classList.remove("hidden");
+}
+
+function closeDetails(){
+  $("detailsModal").classList.add("hidden");
+}
+
+function renderActivity(){
+  const allBids=auctions.flatMap(a=>a.bids.map(b=>({...b,item:a.name})))
+    .sort((a,b)=>b.time-a.time);
+
+  $("bidActivity").innerHTML=allBids.length
+    ?allBids.slice(0,20).map(b=>`
+      <div class="history-item">
+        <strong>${escapeHTML(b.name)}</strong> bid ₹${b.amount}
+        on <strong>${escapeHTML(b.item)}</strong>
+        <div class="muted">${new Date(b.time).toLocaleString()}</div>
+      </div>`).join("")
+    :'<p class="muted" style="margin-top:15px">No bids have been placed yet.</p>';
+}
+
+function refresh(){
+  updateStats();
+  renderAuctions();
+  renderActivity();
+}
+
+["searchInput","categoryFilter","statusFilter"].forEach(id=>{
+  $(id).addEventListener(id==="searchInput"?"input":"change",renderAuctions);
+});
+
+$("detailsModal").addEventListener("click",e=>{
+  if(e.target.id==="detailsModal")closeDetails();
+});
+
+// Update countdowns and mark expired auctions in the display.
+setInterval(()=>{
+  document.querySelectorAll("[data-countdown]").forEach(el=>{
+    const id=Number(el.dataset.countdown);
+    const auction=auctions.find(a=>a.id===id);
+    if(auction)el.textContent=formatTime(auction.endAt-Date.now())+
+      (isLive(auction)?" remaining":"");
+  });
+  updateStats();
+  if(auctions.some(a=>!isLive(a)))renderAuctions();
+},1000);
+
+refresh();
+</script>
+</body>
+</html>
