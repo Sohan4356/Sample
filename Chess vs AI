@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess vs AI</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: #f9fafb;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .app { max-width: 1000px; margin: auto; }
+    h1 { text-align: center; margin: 0 0 8px; }
+    .subtitle { text-align: center; color: #9ca3af; margin-bottom: 24px; }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 600px) minmax(230px, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      aspect-ratio: 1;
+      border: 5px solid #374151;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .square {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(24px, 5vw, 54px);
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+    }
+    .light { background: #f0d9b5; color: #111827; }
+    .dark { background: #b58863; color: #111827; }
+    .selected { box-shadow: inset 0 0 0 5px #facc15; }
+    .target::after {
+      content: "";
+      width: 22%;
+      height: 22%;
+      border-radius: 50%;
+      background: #2563eb99;
+      position: absolute;
+    }
+    .piece { position: relative; z-index: 1; line-height: 1; }
+    .panel {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .panel h2 { margin: 0 0 14px; font-size: 20px; }
+    label { display: block; margin: 12px 0 6px; color: #d1d5db; }
+    select, button {
+      width: 100%;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 7px;
+      font-size: 15px;
+    }
+    select { background: #374151; color: white; }
+    button { cursor: pointer; font-weight: bold; margin-top: 10px; }
+    .primary { background: #2563eb; color: white; }
+    .secondary { background: #4b5563; color: white; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    #status {
+      margin: 14px 0;
+      padding: 12px;
+      border-radius: 8px;
+      background: #111827;
+      color: #d1d5db;
+      min-height: 44px;
+    }
+    #moves {
+      max-height: 250px;
+      overflow-y: auto;
+      padding-left: 24px;
+      color: #d1d5db;
+      line-height: 1.8;
+    }
+    .hint { color: #9ca3af; font-size: 13px; line-height: 1.5; }
+    @media (max-width: 750px) {
+      body { padding: 12px; }
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>♟ Chess vs AI</h1>
+    <p class="subtitle">Play a game against the computer</p>
+
+    <div class="layout">
+      <div>
+        <div id="board" class="board" aria-label="Chess board"></div>
+        <p class="hint">You play White. Click one of your pieces, then click a highlighted destination.</p>
+      </div>
+
+      <aside class="panel">
+        <h2>Game Controls</h2>
+
+        <label for="difficulty">Computer difficulty</label>
+        <select id="difficulty">
+          <option value="1">Easy</option>
+          <option value="2" selected>Medium</option>
+          <option value="3">Hard</option>
+        </select>
+
+        <div id="status">Your turn — White to move.</div>
+        <button id="undo" class="secondary">Undo Last Turn</button>
+        <button id="restart" class="primary">New Game</button>
+
+        <h2 style="margin-top:22px">Move History</h2>
+        <ol id="moves"></ol>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const game = new Chess();
+
+    const boardElement = document.getElementById("board");
+    const statusElement = document.getElementById("status");
+    const movesElement = document.getElementById("moves");
+    const difficultyElement = document.getElementById("difficulty");
+    const undoButton = document.getElementById("undo");
+
+    const files = "abcdefgh";
+    const pieceSymbols = {
+      w: { k: "♔", q: "♕", r: "♖", b: "♗", n: "♘", p: "♙" },
+      b: { k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" }
+    };
+
+    let selectedSquare = null;
+    let legalTargets = [];
+    let thinking = false;
+
+    function squareName(row, col) {
+      return files[col] + (8 - row);
+    }
+
+    function renderBoard() {
+      boardElement.innerHTML = "";
+
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const square = squareName(row, col);
+          const piece = game.get(square);
+          const element = document.createElement("div");
+
+          element.className = "square " + ((row + col) % 2 === 0 ? "light" : "dark");
+          if (square === selectedSquare) element.classList.add("selected");
+          if (legalTargets.includes(square)) element.classList.add("target");
+
+          if (piece) {
+            const pieceElement = document.createElement("span");
+            pieceElement.className = "piece";
+            pieceElement.textContent = pieceSymbols[piece.color][piece.type];
+            element.appendChild(pieceElement);
+          }
+
+          element.addEventListener("click", () => handleSquareClick(square));
+          boardElement.appendChild(element);
+        }
+      }
+
+      renderMoves();
+      updateStatus();
+      undoButton.disabled = game.history().length === 0 || thinking;
+    }
+
+    function handleSquareClick(square) {
+      if (thinking || game.game_over() || game.turn() !== "w") return;
+
+      const piece = game.get(square);
+
+      if (selectedSquare && legalTargets.includes(square)) {
+        makePlayerMove(selectedSquare, square);
+        return;
+      }
+
+      if (piece && piece.color === "w") {
+        selectedSquare = square;
+        legalTargets = game.moves({ square, verbose: true }).map(move => move.to);
+      } else {
+        selectedSquare = null;
+        legalTargets = [];
+      }
+
+      renderBoard();
+    }
+
+    function makePlayerMove(from, to) {
+      const movingPiece = game.get(from);
+      const moveOptions = { from, to };
+
+      // Promote a pawn to a queen automatically.
+      if (movingPiece && movingPiece.type === "p" && (to[1] === "8" || to[1] === "1")) {
+        moveOptions.promotion = "q";
+      }
+
+      const move = game.move(moveOptions);
+      selectedSquare = null;
+      legalTargets = [];
+
+      if (move) {
+        renderBoard();
+        if (!game.game_over()) {
+          thinking = true;
+          updateStatus();
+          setTimeout(makeComputerMove, 150);
+        }
+      }
+    }
+
+    function makeComputerMove() {
+      if (game.game_over()) {
+        thinking = false;
+        renderBoard();
+        return;
+      }
+
+      const depth = Number(difficultyElement.value);
+      const bestMove = findBestMove(depth);
+
+      if (bestMove) {
+        game.move(bestMove);
+      }
+
+      thinking = false;
+      renderBoard();
+    }
+
+    function findBestMove(depth) {
+      const moves = game.moves({ verbose: true });
+      if (!moves.length) return null;
+
+      let bestScore = -Infinity;
+      let bestMoves = [];
+
+      for (const move of moves) {
+        game.move(move);
+        const score = -minimax(depth - 1, -Infinity, Infinity);
+        game.undo();
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestMoves = [move];
+        } else if (score === bestScore) {
+          bestMoves.push(move);
+        }
+      }
+
+      return bestMoves[Math.floor(Math.random() * bestMoves.length)];
+    }
+
+    // Negamax search: the side to move tries to maximize its score.
+    function minimax(depth, alpha, beta) {
+      if (depth === 0 || game.game_over()) {
+        return evaluatePosition();
+      }
+
+      const moves = game.moves({ verbose: true });
+      let bestScore = -Infinity;
+
+      for (const move of moves) {
+        game.move(move);
+        const score = -minimax(depth - 1, -beta, -alpha);
+        game.undo();
+
+        bestScore = Math.max(bestScore, score);
+        alpha = Math.max(alpha, score);
+
+        if (alpha >= beta) break;
+      }
+
+      return bestScore;
+    }
+
+    function evaluatePosition() {
+      if (game.in_checkmate()) return game.turn() === "b" ? -100000 : 100000;
+      if (game.in_draw()) return 0;
+
+      const values = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
+      let score = 0;
+
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const piece = game.get(squareName(row, col));
+          if (!piece) continue;
+
+          const value = values[piece.type];
+          score += piece.color === "b" ? value : -value;
+        }
+      }
+
+      // The computer is Black, so positive scores favor the computer.
+      return game.turn() === "b" ? score : -score;
+    }
+
+    function renderMoves() {
+      const history = game.history();
+      movesElement.innerHTML = "";
+
+      for (let i = 0; i < history.length; i += 2) {
+        const item = document.createElement("li");
+        item.textContent = history[i] + (history[i + 1] ? "  " + history[i + 1] : "");
+        movesElement.appendChild(item);
+      }
+
+      movesElement.scrollTop = movesElement.scrollHeight;
+    }
+
+    function updateStatus() {
+      if (thinking) {
+        statusElement.textContent = "Computer is thinking…";
+      } else if (game.in_checkmate()) {
+        statusElement.textContent = game.turn() === "w"
+          ? "Checkmate — Computer wins!"
+          : "Checkmate — You win!";
+      } else if (game.in_draw()) {
+        statusElement.textContent = "Game drawn.";
+      } else {
+        const turn = game.turn() === "w" ? "White (you)" : "Black (computer)";
+        statusElement.textContent = turn + " to move" + (game.in_check() ? " — Check!" : ".");
+      }
+    }
+
+    function restartGame() {
+      game.reset();
+      selectedSquare = null;
+      legalTargets = [];
+      thinking = false;
+      renderBoard();
+    }
+
+    function undoTurn() {
+      if (thinking || game.history().length === 0) return;
+
+      game.undo(); // Undo computer's move, if present.
+      if (game.turn() === "b" && game.history().length > 0) {
+        game.undo(); // Undo player's move too.
+      }
+
+      selectedSquare = null;
+      legalTargets = [];
+      renderBoard();
+    }
+
+    document.getElementById("restart").addEventListener("click", restartGame);
+    undoButton.addEventListener("click", undoTurn);
+
+    renderBoard();
+  </script>
+</body>
+</html>
