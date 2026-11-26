@@ -1,0 +1,463 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusPath - College Navigation</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f3f6fb;color:#20283b}
+header{background:#182541;color:white;padding:18px 6%;
+display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.logo{font-size:24px;font-weight:bold;color:#65dfbd}
+nav a{color:white;text-decoration:none;margin-left:18px;font-size:14px}
+.hero{background:linear-gradient(120deg,#182541,#405b88);color:white;padding:35px 6%}
+.hero h1{font-size:30px;margin-bottom:9px}
+.hero p{color:#dce5f2;line-height:1.5}
+.container{max-width:1250px;margin:25px auto;padding:0 16px}
+.layout{display:grid;grid-template-columns:330px 1fr;gap:20px;align-items:start}
+.panel{background:white;border:1px solid #e3e8f0;border-radius:12px;padding:20px}
+.panel h2{font-size:19px;margin-bottom:8px}
+.muted{font-size:13px;color:#7b8498;line-height:1.5}
+.field{margin-top:15px}
+label{display:block;font-size:13px;font-weight:bold;margin-bottom:7px}
+input,select{width:100%;padding:11px;border:1px solid #dce2ec;
+border-radius:7px;font-size:14px;background:white}
+button{border:0;border-radius:7px;padding:11px 15px;
+font-weight:bold;cursor:pointer;background:#12a886;color:white}
+button:hover{opacity:.87}
+.secondary{background:#e9edf5;color:#293650}
+.route-button{width:100%;margin-top:15px}
+.location-list{margin-top:18px;display:grid;gap:8px}
+.location-item{padding:11px;border:1px solid #e5e9f1;border-radius:8px;
+cursor:pointer;display:flex;gap:10px;align-items:center}
+.location-item:hover,.location-item.active{background:#eaf8f4;border-color:#12a886}
+.location-icon{font-size:22px}
+.location-item strong{display:block;font-size:13px}
+.location-item small{color:#7b8498;font-size:11px}
+.map-panel{min-width:0}
+.map-heading{display:flex;justify-content:space-between;align-items:center;
+gap:10px;flex-wrap:wrap;margin-bottom:15px}
+.map-wrap{background:#edf3e9;border:1px solid #dfe8d8;border-radius:12px;
+overflow:hidden;position:relative}
+svg{display:block;width:100%;height:auto;min-height:360px}
+.road{stroke:#fff;stroke-width:20;stroke-linecap:round;fill:none}
+.road-edge{stroke:#d9dfd3;stroke-width:24;stroke-linecap:round;fill:none}
+.route-line{stroke:#12a886;stroke-width:7;stroke-linecap:round;
+stroke-linejoin:round;fill:none;stroke-dasharray:12 7}
+.node{cursor:pointer}
+.node circle{fill:#fff;stroke:#63728b;stroke-width:3}
+.node text{font-family:Arial,sans-serif;font-size:12px;fill:#24334c;
+font-weight:bold;pointer-events:none}
+.node.selected circle{fill:#12a886;stroke:#08775e}
+.node.selected text{fill:#08775e}
+.node.route-node circle{fill:#b8f1df;stroke:#12a886}
+.map-legend{display:flex;gap:15px;flex-wrap:wrap;margin-top:12px;
+font-size:12px;color:#68748a}
+.legend-dot{display:inline-block;width:12px;height:12px;
+border-radius:50%;margin-right:5px;background:#fff;border:2px solid #63728b}
+.legend-dot.route{background:#b8f1df;border-color:#12a886}
+.route-result{margin-top:18px}
+.route-summary{background:#eaf8f4;border-radius:9px;padding:13px;
+margin:12px 0;color:#176e59;font-size:14px;line-height:1.6}
+.steps{list-style:none;margin-top:12px}
+.steps li{padding:12px 0;border-bottom:1px solid #edf0f5;
+display:flex;gap:12px;line-height:1.5;font-size:14px}
+.steps li:last-child{border-bottom:0}
+.step-number{background:#eaf8f4;color:#13866b;border-radius:50%;
+width:27px;height:27px;flex:0 0 27px;display:grid;place-items:center;
+font-weight:bold;font-size:12px}
+.info-box{margin-top:14px;background:#f6f8fb;border-radius:8px;
+padding:12px;font-size:13px;line-height:1.6}
+.hidden{display:none!important}
+footer{text-align:center;color:#7b8498;font-size:13px;padding:28px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+@media(max-width:550px){
+.hero h1{font-size:25px}
+nav a{margin-left:8px}
+svg{min-height:280px}
+.panel{padding:15px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🧭 CampusPath</div>
+  <nav>
+    <a href="#navigate">Navigate</a>
+    <a href="#campusMap">Campus Map</a>
+    <a href="#locations">Locations</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Find Your Way Around Campus</h1>
+  <p>Choose where you are and where you want to go. CampusPath will show you a route.</p>
+</section>
+
+<main class="container">
+  <div class="layout">
+
+    <aside class="panel" id="navigate">
+      <h2>Plan Your Route</h2>
+      <p class="muted">Choose a starting location and destination.</p>
+
+      <div class="field">
+        <label for="startSelect">STARTING POINT</label>
+        <select id="startSelect"></select>
+      </div>
+
+      <div class="field">
+        <label for="endSelect">DESTINATION</label>
+        <select id="endSelect"></select>
+      </div>
+
+      <button class="route-button" id="routeBtn">Find Route</button>
+      <button class="route-button secondary" id="clearBtn">Clear Route</button>
+
+      <div id="routeResult" class="route-result hidden"></div>
+
+      <div class="info-box">
+        <strong>Tip:</strong> You can also click a location on the map.
+        Select it as the start or destination using the buttons in its details.
+      </div>
+    </aside>
+
+    <section class="panel map-panel" id="campusMap">
+      <div class="map-heading">
+        <div>
+          <h2>Campus Map</h2>
+          <p class="muted">Demo campus layout — not a real college map.</p>
+        </div>
+        <span class="muted" id="mapStatus">Select a route to begin</span>
+      </div>
+
+      <div class="map-wrap">
+        <svg id="mapSvg" viewBox="0 0 900 560" role="img"
+          aria-label="Interactive campus map">
+          <rect x="0" y="0" width="900" height="560" fill="#eaf1e5"/>
+          <!-- Green areas -->
+          <rect x="25" y="25" width="190" height="105" rx="18" fill="#d8e8cd"/>
+          <rect x="675" y="30" width="190" height="115" rx="18" fill="#d8e8cd"/>
+          <rect x="30" y="420" width="230" height="110" rx="18" fill="#d8e8cd"/>
+          <rect x="650" y="410" width="220" height="120" rx="18" fill="#d8e8cd"/>
+          <!-- Roads -->
+          <path class="road-edge" d="M70 280 H830 M450 70 V500 M150 100 V450 M750 100 V450"/>
+          <path class="road" d="M70 280 H830 M450 70 V500 M150 100 V450 M750 100 V450"/>
+          <path class="road-edge" d="M150 160 H750 M150 400 H750"/>
+          <path class="road" d="M150 160 H750 M150 400 H750"/>
+          <!-- Buildings -->
+          <g fill="#cbd7e8" stroke="#aab9cf" stroke-width="2">
+            <rect x="270" y="75" width="125" height="65" rx="8"/>
+            <rect x="500" y="75" width="125" height="65" rx="8"/>
+            <rect x="270" y="185" width="125" height="65" rx="8"/>
+            <rect x="500" y="185" width="125" height="65" rx="8"/>
+            <rect x="270" y="315" width="125" height="65" rx="8"/>
+            <rect x="500" y="315" width="125" height="65" rx="8"/>
+            <rect x="270" y="425" width="125" height="65" rx="8"/>
+            <rect x="500" y="425" width="125" height="65" rx="8"/>
+          </g>
+          <g fill="#536681" font-size="13" text-anchor="middle">
+            <text x="332" y="113">Academic Block</text>
+            <text x="562" y="113">Science Block</text>
+            <text x="332" y="223">Library</text>
+            <text x="562" y="223">Labs</text>
+            <text x="332" y="353">Canteen</text>
+            <text x="562" y="353">Auditorium</text>
+            <text x="332" y="463">Sports Block</text>
+            <text x="562" y="463">Hostel</text>
+          </g>
+          <g id="routeLayer"></g>
+          <g id="nodeLayer"></g>
+        </svg>
+      </div>
+
+      <div class="map-legend">
+        <span><i class="legend-dot"></i> Campus location</span>
+        <span><i class="legend-dot route"></i> Route location</span>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" id="locations" style="margin-top:22px">
+    <h2>Campus Locations</h2>
+    <p class="muted">Search for a place or choose one from the list.</p>
+
+    <div class="field">
+      <input id="locationSearch" placeholder="Search locations...">
+    </div>
+    <div class="field">
+      <select id="categoryFilter">
+        <option value="All">All categories</option>
+        <option>Academic</option>
+        <option>Food</option>
+        <option>Facilities</option>
+        <option>Sports</option>
+        <option>Accommodation</option>
+      </select>
+    </div>
+
+    <div class="location-list" id="locationList"></div>
+  </section>
+</main>
+
+<footer>CampusPath | College Navigation Web Project</footer>
+
+<script>
+// Each location has a map position and connected paths.
+// Distances are illustrative walking distances in metres.
+const locations = [
+  {id:"gate",name:"Main Gate",category:"Facilities",icon:"🚪",x:70,y:280,
+   description:"Main entrance to the college campus."},
+  {id:"admin",name:"Admin Office",category:"Facilities",icon:"🏢",x:150,y:160,
+   description:"Administrative office and student services."},
+  {id:"academic",name:"Academic Block",category:"Academic",icon:"🏫",x:332,y:110,
+   description:"Classrooms and faculty offices."},
+  {id:"science",name:"Science Block",category:"Academic",icon:"🧪",x:562,y:110,
+   description:"Science classrooms and departments."},
+  {id:"library",name:"Library",category:"Academic",icon:"📚",x:332,y:220,
+   description:"Books, study spaces, and reading rooms."},
+  {id:"labs",name:"Computer Labs",category:"Academic",icon:"💻",x:562,y:220,
+   description:"Computer laboratories for practical sessions."},
+  {id:"canteen",name:"Canteen",category:"Food",icon:"🍽️",x:332,y:350,
+   description:"Food and refreshments."},
+  {id:"auditorium",name:"Auditorium",category:"Facilities",icon:"🎤",x:562,y:350,
+   description:"Events, seminars, and college functions."},
+  {id:"sports",name:"Sports Block",category:"Sports",icon:"🏀",x:332,y:460,
+   description:"Indoor sports and recreation facilities."},
+  {id:"hostel",name:"Hostel",category:"Accommodation",icon:"🏠",x:562,y:460,
+   description:"Student accommodation."},
+  {id:"eastGate",name:"East Gate",category:"Facilities",icon:"🚪",x:830,y:280,
+   description:"Secondary campus entrance."}
+];
+
+// Undirected graph: neighbours and walking distances in metres.
+const graph = {
+  gate: {admin:120,library:280},
+  admin: {gate:120,academic:190,library:100},
+  academic: {admin:190,science:230,library:110},
+  science: {academic:230,labs:110,eastGate:190},
+  library: {gate:280,admin:100,academic:110,labs:230,canteen:130},
+  labs: {science:110,library:230,auditorium:130},
+  canteen: {library:130,auditorium:230,sports:110},
+  auditorium: {labs:130,canteen:230,hostel:110,eastGate:190},
+  sports: {canteen:110,hostel:230},
+  hostel: {auditorium:110,sports:230,eastGate:180},
+  eastGate: {science:190,auditorium:190,hostel:180}
+};
+
+const $ = id => document.getElementById(id);
+let selectedLocation = null;
+let currentRoute = [];
+
+function getLocation(id){
+  return locations.find(location=>location.id===id);
+}
+
+function populateSelects(){
+  const options=locations.map(l=>
+    `<option value="${l.id}">${l.name}</option>`).join("");
+  $("startSelect").innerHTML=options;
+  $("endSelect").innerHTML=options;
+  $("startSelect").value="gate";
+  $("endSelect").value="library";
+}
+
+function renderMap(){
+  $("nodeLayer").innerHTML=locations.map(l=>{
+    const classes=[
+      "node",
+      selectedLocation===l.id?"selected":"",
+      currentRoute.includes(l.id)?"route-node":""
+    ].join(" ");
+    return `
+      <g class="${classes}" data-id="${l.id}" tabindex="0" role="button"
+        aria-label="${l.name}" onclick="selectMapLocation('${l.id}')"
+        onkeydown="if(event.key==='Enter'||event.key===' '){selectMapLocation('${l.id}')}">
+        <circle cx="${l.x}" cy="${l.y}" r="19"/>
+        <text x="${l.x}" y="${l.y+4}" text-anchor="middle">${l.icon}</text>
+        <text x="${l.x}" y="${l.y+34}" text-anchor="middle">${l.name}</text>
+      </g>`;
+  }).join("");
+}
+
+function renderRoute(){
+  const layer=$("routeLayer");
+  if(currentRoute.length<2){
+    layer.innerHTML="";
+    return;
+  }
+  const points=currentRoute.map(id=>{
+    const l=getLocation(id);
+    return `${l.x},${l.y}`;
+  }).join(" ");
+  layer.innerHTML=`<polyline class="route-line" points="${points}"/>`;
+}
+
+function selectMapLocation(id){
+  selectedLocation=id;
+  renderMap();
+  showLocationDetails(id);
+}
+
+function showLocationDetails(id){
+  const l=getLocation(id);
+  if(!l)return;
+  $("mapStatus").textContent=l.name;
+  $("routeResult").classList.remove("hidden");
+  $("routeResult").innerHTML=`
+    <h3>${l.icon} ${l.name}</h3>
+    <p class="muted">${l.category} · ${l.description}</p>
+    <div class="actions">
+      <button onclick="setStart('${l.id}')">Set as Start</button>
+      <button class="secondary" onclick="setDestination('${l.id}')">Set as Destination</button>
+    </div>`;
+}
+
+function setStart(id){
+  $("startSelect").value=id;
+  selectedLocation=id;
+  renderMap();
+}
+
+function setDestination(id){
+  $("endSelect").value=id;
+  selectedLocation=id;
+  renderMap();
+}
+
+function shortestPath(start,end){
+  const distances={};
+  const previous={};
+  const unvisited=new Set(locations.map(l=>l.id));
+
+  locations.forEach(l=>distances[l.id]=Infinity);
+  distances[start]=0;
+
+  while(unvisited.size){
+    let current=null;
+    let smallest=Infinity;
+
+    for(const id of unvisited){
+      if(distances[id]<smallest){
+        smallest=distances[id];
+        current=id;
+      }
+    }
+
+    if(current===null||smallest===Infinity)break;
+    if(current===end)break;
+    unvisited.delete(current);
+
+    for(const [neighbor,distance] of Object.entries(graph[current]||{})){
+      if(!unvisited.has(neighbor))continue;
+      const candidate=distances[current]+distance;
+      if(candidate<distances[neighbor]){
+        distances[neighbor]=candidate;
+        previous[neighbor]=current;
+      }
+    }
+  }
+
+  if(distances[end]===Infinity)return null;
+
+  const path=[];
+  let current=end;
+  while(current){
+    path.unshift(current);
+    current=previous[current];
+  }
+
+  return {path,distance:distances[end]};
+}
+
+function findRoute(){
+  const start=$("startSelect").value;
+  const end=$("endSelect").value;
+
+  if(start===end){
+    alert("Choose different starting and destination locations.");
+    return;
+  }
+
+  const result=shortestPath(start,end);
+  if(!result){
+    alert("No route found between these locations.");
+    return;
+  }
+
+  currentRoute=result.path;
+  selectedLocation=null;
+  renderMap();
+  renderRoute();
+
+  const minutes=Math.max(1,Math.ceil(result.distance/75));
+  $("mapStatus").textContent=`${result.distance} m · about ${minutes} min`;
+
+  $("routeResult").classList.remove("hidden");
+  $("routeResult").innerHTML=`
+    <h3>Route Found</h3>
+    <div class="route-summary">
+      <strong>${getLocation(start).name}</strong> → 
+      <strong>${getLocation(end).name}</strong><br>
+      Distance: ${result.distance} metres<br>
+      Estimated walking time: ${minutes} minute(s)
+    </div>
+    <h3>Directions</h3>
+    <ol class="steps">
+      ${result.path.map((id,index)=>`
+        <li>
+          <span class="step-number">${index+1}</span>
+          <span>${index===0?"Start at":index===result.path.length-1?"Arrive at":"Continue to"}
+          <strong>${getLocation(id).name}</strong>
+          ${index===0?getLocation(id).description:""}</span>
+        </li>`).join("")}
+    </ol>`;
+}
+
+function clearRoute(){
+  currentRoute=[];
+  selectedLocation=null;
+  renderMap();
+  renderRoute();
+  $("routeResult").classList.add("hidden");
+  $("mapStatus").textContent="Select a route to begin";
+}
+
+function renderLocations(){
+  const search=$("locationSearch").value.toLowerCase().trim();
+  const category=$("categoryFilter").value;
+  const filtered=locations.filter(l=>
+    (l.name.toLowerCase().includes(search)||
+     l.description.toLowerCase().includes(search))&&
+    (category==="All"||l.category===category));
+
+  if(!filtered.length){
+    $("locationList").innerHTML='<p class="muted">No locations found.</p>';
+    return;
+  }
+
+  $("locationList").innerHTML=filtered.map(l=>`
+    <div class="location-item ${selectedLocation===l.id?"active":""}"
+      onclick="selectMapLocation('${l.id}')">
+      <div class="location-icon">${l.icon}</div>
+      <div>
+        <strong>${l.name}</strong>
+        <small>${l.category} · ${l.description}</small>
+      </div>
+    </div>`).join("");
+}
+
+$("routeBtn").addEventListener("click",findRoute);
+$("clearBtn").addEventListener("click",clearRoute);
+$("locationSearch").addEventListener("input",renderLocations);
+$("categoryFilter").addEventListener("change",renderLocations);
+
+populateSelects();
+renderMap();
+renderLocations();
+</script>
+</body>
+</html>
